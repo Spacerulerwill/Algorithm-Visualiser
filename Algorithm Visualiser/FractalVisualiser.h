@@ -25,6 +25,9 @@ private:
     int zoomLoc;
     int locationLoc;
 
+    //julia set C
+    int cLoc;
+
     float color_1;
     float color_2;
     float color_3;
@@ -32,7 +35,10 @@ private:
     int iterations = 50;
     float resolution[2] = {getWidth(), getHeight()};
     float location[2] = {0, 0};
-    float zoom  = 1.0f;
+    float zoom  = 2.0f;
+
+    //julia set C coordinate
+    float c[2] = { 1,0 };
 
     int selectedFractal = 0;
     const char* fractals[4] = { "Mandelbrot Set", "Julia Set", "Burning Ship Fractal", "Tricorn"};

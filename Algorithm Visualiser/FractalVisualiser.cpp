@@ -72,6 +72,9 @@ void FractalVisualiser::draw()
     resolution[1] = getHeight();
     SetShaderValue(*activeFractal, resolutionLoc, &resolution, SHADER_UNIFORM_VEC2);
 
+    if (activeFractal == &julia) {
+        SetShaderValue(*activeFractal, cLoc, &c, SHADER_UNIFORM_VEC2);
+    }
 }
 	
 void FractalVisualiser::keyEvents()
@@ -128,4 +131,8 @@ void FractalVisualiser::setFractal(Shader& fractal)
     resolutionLoc = GetShaderLocation(fractal, "resolution");
     locationLoc = GetShaderLocation(fractal, "location");
     zoomLoc = GetShaderLocation(fractal, "zoom");
+
+    if (&fractal == &julia) {
+        cLoc = GetShaderLocation(fractal, "c");
+    }
 }

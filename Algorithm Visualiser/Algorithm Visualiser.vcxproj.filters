@@ -41,10 +41,10 @@
     <ClCompile Include="SortingVisualiser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\fuck off\Algorithm Visualiser\Algorithm Visualiser\imgui_impl_raylib.cpp">
+    <ClCompile Include="imgui_impl_raylib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\fuck off\Algorithm Visualiser\Algorithm Visualiser\rlImGui.cpp">
+    <ClCompile Include="rlImGui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
