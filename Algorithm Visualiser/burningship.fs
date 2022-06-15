@@ -2,6 +2,8 @@
 
 uniform vec2 resolution;
 uniform vec2 location;
+uniform vec2 mousePos;
+uniform bool juliaMode;
 uniform float zoom;
 uniform float color_1;
 uniform float color_2;
@@ -43,5 +45,6 @@ void main()
     uv -= vec2(1, 0.5);
     uv *= zoom;
     uv -= location;
+    uv.xy *= -1;
     gl_FragColor = vec4(burningship(uv), 1.0);
 }

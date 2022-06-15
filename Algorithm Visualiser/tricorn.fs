@@ -2,6 +2,8 @@
 
 uniform vec2 resolution;
 uniform vec2 location;
+uniform vec2 mousePos;
+uniform bool juliaMode;
 uniform float zoom;
 uniform float color_1;
 uniform float color_2;

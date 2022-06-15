@@ -1,7 +1,5 @@
 #pragma once
 #include "ScreenElement.h"
-#include <complex>
-#include <cmath>
 
 class FractalVisualiser :
 
@@ -14,6 +12,7 @@ public:
     //override draw method
     void draw() override;
     void keyEvents() override;
+
 private:
 
     int color_1Loc;   
@@ -24,29 +23,27 @@ private:
     int resolutionLoc;
     int zoomLoc;
     int locationLoc;
+    int mousePosLoc;
+    int juliaModeLoc;
 
-    //julia set C
-    int cLoc;
-
-    float color_1;
-    float color_2;
-    float color_3;
-    float color_4;
-    int iterations = 50;
+    float color_1 = 0.0f;
+    float color_2 = 0.0f;
+    float color_3 = 0.0f;
+    float color_4 = 0.0f;
+    int iterations = 100;
     float resolution[2] = {getWidth(), getHeight()};
+
+    Vector2 mousePos = { 0,0 };
+    bool juliaMode = false;
     float location[2] = {0, 0};
     float zoom  = 2.0f;
 
-    //julia set C coordinate
-    float c[2] = { 1,0 };
-
     int selectedFractal = 0;
-    const char* fractals[4] = { "Mandelbrot Set", "Julia Set", "Burning Ship Fractal", "Tricorn"};
+    const char* fractals[3] = { "Mandelbrot Set", "Burning Ship Fractal", "Tricorn"};
 
     Shader mandelbrot;
     Shader burningShip;
     Shader tricorn;
-    Shader julia;
     Shader* activeFractal = &mandelbrot;
 
     bool fractalSelector;
