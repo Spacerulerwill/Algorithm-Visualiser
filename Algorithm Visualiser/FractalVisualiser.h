@@ -54,6 +54,8 @@ private:
     Texture2D texture;
 
     void setFractal(Shader& shader);
-   
+    float mapToReal(float x, float minR, float maxR);
+    float mapToImaginary(float x, float minI, float maxI);
+
 };
 

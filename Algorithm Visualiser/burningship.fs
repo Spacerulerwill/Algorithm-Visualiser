@@ -38,14 +38,8 @@ float mapToImaginary(float y, float minI, float maxI){
 vec3 burningship(vec2 point){
     vec2 z;
     if (juliaMode){ //z is point - julia set
-       z = point;
-
-      //map mouse coordinate to mandelbrot point
-      float minR = ((-1 * resolution.x)/resolution.y);
-      float maxR = (resolution.x/resolution.y);
-      float minI = -1;
-      float maxI = 1;
-      point= vec2(mapToReal(mousePos.x, minR, maxR), mapToImaginary(mousePos.y, minI, maxI));
+      z = point;
+      point = mousePos;
 
     }else{ //z starts at 0 and is squared, with point added on - mandelbrot set
         z = vec2(0.0);
@@ -73,6 +67,6 @@ void main()
         uv *= zoom; //zoom
         uv -= location;
     }
-    uv.xy *= -1;
+    uv.y *= -1;
     gl_FragColor = vec4(burningship(uv), 1.0);
 }

@@ -39,15 +39,8 @@ float mapToImaginary(float y, float minI, float maxI){
 vec3 tricorn(vec2 point){
     vec2 z;
     if (juliaMode){ //z is point - julia set
-       z = point;
-
-      //map mouse coordinate to mandelbrot point
-      float minR = ((-1 * resolution.x)/resolution.y);
-      float maxR = (resolution.x/resolution.y);
-      float minI = -1;
-      float maxI = 1;
-      point= vec2(mapToReal(mousePos.x, minR, maxR), mapToImaginary(mousePos.y, minI, maxI));
-
+        z = point;
+        point = mousePos;
     }else{ //z starts at 0 and is squared, with point added on - mandelbrot set
         z = vec2(0.0);
     }
@@ -67,6 +60,7 @@ void main()
     vec2 uv = gl_FragCoord.xy / resolution;
     uv.x *= resolution.x / resolution.y;
     uv -= vec2((resolution.x/resolution.y)/2, 0.5);
+
     if (juliaMode){
         uv *= 2.5;
     }

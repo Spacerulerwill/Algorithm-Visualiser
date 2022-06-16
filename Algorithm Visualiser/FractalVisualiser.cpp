@@ -21,9 +21,18 @@ FractalVisualiser::FractalVisualiser(float xRatio, float yRatio, float widthRati
     setFractal(mandelbrot);
 }
 
+float FractalVisualiser::mapToReal(float x, float minR, float maxR) {
+    float range = maxR - minR;
+    return x * (range / getWidth()) + minR;
+}
+
+float FractalVisualiser::mapToImaginary(float y, float minI, float maxI) {
+    float range = maxI - minI;
+    return y * (range / getHeight()) + minI;
+}
+
 void FractalVisualiser::draw()
-{
-   
+{  
     BeginShaderMode(*activeFractal);
     DrawTexturePro(texture, Rectangle{ getX(), getY(), (float)texture.width, (float)texture.height }, Rectangle{ getX(), getY(), getWidth(), getHeight() }, Vector2{ 0, 0 }, 0.0f, WHITE);
     EndShaderMode();
@@ -34,7 +43,7 @@ void FractalVisualiser::draw()
     stream << "Focused on point: ";
 
     if (juliaMode) {
-        stream << "\n";
+        stream << mousePos.x << "  + " << -mousePos.y << "i\n";
     }
     else {
         stream << -location[0] << " + " << -location[1] << "i\n";
@@ -82,7 +91,12 @@ void FractalVisualiser::draw()
     SetShaderValue(*activeFractal, juliaModeLoc, &juliaMode, SHADER_UNIFORM_INT);
 
     if (!juliaFrozen) {
-        mousePos = GetMousePosition();
+        //map mouse coordinate to mandelbrot point
+        float minR = (-1 * getWidth() / getHeight());
+        float maxR = (getWidth() / getHeight());
+        float minI = -1;
+        float maxI = 1;
+        mousePos = Vector2{ mapToReal(GetMousePosition().x, minR, maxR), mapToImaginary(GetMousePosition().y, minI, maxI)};
     }
 
     SetShaderValue(*activeFractal, mousePosLoc, &mousePos, SHADER_UNIFORM_VEC2);
