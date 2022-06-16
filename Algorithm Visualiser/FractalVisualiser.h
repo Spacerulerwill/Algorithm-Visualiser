@@ -13,6 +13,8 @@ public:
     void draw() override;
     void keyEvents() override;
 
+    ~FractalVisualiser();
+
 private:
 
     int color_1Loc;   
@@ -32,11 +34,12 @@ private:
     float color_4 = 0.0f;
     int iterations = 100;
     float resolution[2] = {getWidth(), getHeight()};
+    float location[2] = {0.0f, 0.0f };
 
-    Vector2 mousePos = { 0,0 };
+    Vector2 mousePos = {0,0};
     bool juliaMode = false;
-    float location[2] = {0, 0};
-    float zoom  = 2.0f;
+    bool juliaFrozen = false;
+    float zoom = 2.0f;
 
     int selectedFractal = 0;
     const char* fractals[3] = { "Mandelbrot Set", "Burning Ship Fractal", "Tricorn"};
@@ -48,7 +51,7 @@ private:
 
     bool fractalSelector;
 
-    RenderTexture2D target;
+    Texture2D texture;
 
     void setFractal(Shader& shader);
    

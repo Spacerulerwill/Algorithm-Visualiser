@@ -3,8 +3,8 @@
 #include "imgui_impl_raylib.h"
 #include "imgui_internal.h"
 #include "rlImGui.h"
-#include <iostream>
 #include <sstream>
+#include <thread>
 
 #define GLSL_VERSION 450
 
@@ -14,46 +14,55 @@ FractalVisualiser::FractalVisualiser(float xRatio, float yRatio, float widthRati
     burningShip = LoadShader(0, TextFormat("burningship.fs", GLSL_VERSION));
     tricorn = LoadShader(0, TextFormat("tricorn.fs", GLSL_VERSION));
 
-    target = LoadRenderTexture(getWidth(), getHeight());
+    Image imBlank = GenImageColor(getWidth(), getHeight(), BLANK);
+    texture = LoadTextureFromImage(imBlank);  // Load blank texture to fill on shader
+    UnloadImage(imBlank);
 
     setFractal(mandelbrot);
 }
 
 void FractalVisualiser::draw()
 {
-
-    //enable drawing to texture, clear its background
-    BeginTextureMode(target);       // Enable drawing to texture
-    ClearBackground(RAYWHITE);  // Clear texture background
-    EndTextureMode();               // End drawing to texture (now we have a texture available for next passes)
-
-
-    // Render generated texture using selected postprocessing shader
+   
     BeginShaderMode(*activeFractal);
-    // NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
-    DrawTexturePro(target.texture, Rectangle{ getX(), getY(), (float)target.texture.width, (float)target.texture.height}, Rectangle{getX(), getY(), getWidth(), getHeight()}, Vector2{0, 0}, 0.0f, WHITE);
-
+    DrawTexturePro(texture, Rectangle{ getX(), getY(), (float)texture.width, (float)texture.height }, Rectangle{ getX(), getY(), getWidth(), getHeight() }, Vector2{ 0, 0 }, 0.0f, WHITE);
     EndShaderMode();
-
+    
     //Draw Text
     float font = (GetScreenWidth()) / 50;
     std::stringstream stream;
     stream << "Focused on point: ";
-    stream << -location[0] << " + " << -location[1] << "i\n";
+
+    if (juliaMode) {
+        stream << "\n";
+    }
+    else {
+        stream << -location[0] << " + " << -location[1] << "i\n";
+    }
+
     stream << zoom << "x zoom\n";
-    stream << "Press J to toggle Julia Set mode";
+    stream << "J - toggle Julia Set mode\n";
+
+    if (juliaMode) {
+        if (juliaFrozen) {
+            stream << "Enter - unfreeze Julia Set\n";
+        }
+        else {
+            stream << "Enter - freeze Julia Set\n";
+        }
+        stream << "S - save image\n";
+    }
 
     std::string s = stream.str();
     const char* text = s.c_str();
     DrawText(text, 0, 0, font, WHITE);
 
-    DrawPixel(getWidth() / 2, getHeight() / 2, RED);
-
     //Draw UI
-
     ImGui::Begin("Fractal Settings", NULL, ImGuiWindowFlags_None);
     fractalSelector = ImGui::Combo("Fractal", &selectedFractal, fractals, 3);
     ImGui::SliderInt("Iterations", &iterations, 0, 1000, "% .3f");
+    
+    //float conversion for slider bar
     ImGui::SliderFloat("Color 1", &color_1, 0.0f, 1.0f, "% .3f");
     ImGui::SliderFloat("Color 2", &color_2, 0.0f, 1.0f, "% .3f");
     ImGui::SliderFloat("Color 3", &color_3, 0.0f, 1.0f, "% .3f");
@@ -70,18 +79,28 @@ void FractalVisualiser::draw()
     resolution[0] = getWidth();
     resolution[1] = getHeight();
     SetShaderValue(*activeFractal, resolutionLoc, &resolution, SHADER_UNIFORM_VEC2);
-
-    mousePos = GetMousePosition();
-    SetShaderValue(*activeFractal, mousePosLoc, &mousePos, SHADER_UNIFORM_VEC2);
     SetShaderValue(*activeFractal, juliaModeLoc, &juliaMode, SHADER_UNIFORM_INT);
 
+    if (!juliaFrozen) {
+        mousePos = GetMousePosition();
+    }
+
+    SetShaderValue(*activeFractal, mousePosLoc, &mousePos, SHADER_UNIFORM_VEC2);
 }
 	
 void FractalVisualiser::keyEvents()
 {
     if (IsKeyPressed(KEY_J)) {
         juliaMode = !juliaMode;
-        std::cout << juliaMode;
+    }
+    if (IsKeyPressed(KEY_S)) {
+        //must update
+        Image image = LoadImageFromScreen();
+        ExportImage(image, "fractal.png");
+        UnloadImage(image);
+    }
+    if (IsKeyPressed(KEY_ENTER) && juliaMode) {
+        juliaFrozen = !juliaFrozen; //pause or resume julia set
     }
     if (IsKeyDown(KEY_DOWN)) {
         location[1] += 0.01 * zoom;
@@ -101,7 +120,7 @@ void FractalVisualiser::keyEvents()
     if (IsKeyDown(KEY_MINUS)) {
         zoom += 0.01 * zoom;
     }
-
+    //selecting fractal from menu
     if (fractalSelector) {
         switch (selectedFractal) {
         case 0: {
@@ -122,7 +141,9 @@ void FractalVisualiser::keyEvents()
 
 void FractalVisualiser::setFractal(Shader& fractal)
 {
+    //uniform locations
     activeFractal = &fractal;
+    zoomLoc = GetShaderLocation(fractal, "zoom");
     color_1Loc = GetShaderLocation(fractal, "color_1");
     color_2Loc = GetShaderLocation(fractal, "color_2");
     color_3Loc = GetShaderLocation(fractal, "color_3");
@@ -130,9 +151,14 @@ void FractalVisualiser::setFractal(Shader& fractal)
     iterationsLoc = GetShaderLocation(fractal, "iterations");
     resolutionLoc = GetShaderLocation(fractal, "resolution");
     locationLoc = GetShaderLocation(fractal, "location");
-    zoomLoc = GetShaderLocation(fractal, "zoom");
     mousePosLoc = GetShaderLocation(fractal, "mousePos");
-    juliaModeLoc = GetShaderLocation(fractal, "juliaMode");
-    
+    juliaModeLoc = GetShaderLocation(fractal, "juliaMode");   
 }
 
+FractalVisualiser::~FractalVisualiser()
+{
+    UnloadTexture(texture);
+    UnloadShader(mandelbrot);    
+    UnloadShader(burningShip);
+    UnloadShader(tricorn);
+}

@@ -321,7 +321,6 @@ void SortingVisualiser::insertionSort(std::vector<int>& arr)
 		{
 			comparisonsMade++;
 			arrayAccesses += 2;
-			if (j > 0)
 
 			std::this_thread::sleep_for(std::chrono::nanoseconds(nsDelay));
 			swapsMade++;
