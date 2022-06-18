@@ -44,12 +44,18 @@ private:
     int selectedFractal = 0;
     const char* fractals[3] = { "Mandelbrot Set", "Burning Ship Fractal", "Tricorn"};
 
+    // preset color schemes
+    int selectedColorPreset = 0;
+    const char* colorPresetNames[4] = {"Default", "Electric Blue", "Blood Red", "Neon Green"};
+    const float colorPresets[4][4] = { {0.0, 0.0, 0.0, 0.0}, {0.109, 0.134, 0.144, 0.791}, {0.199, 0.159, 0.164, 1.0}, {1.0, 0.308, 0.194, 1.0} };
+
     Shader mandelbrot;
     Shader burningShip;
     Shader tricorn;
     Shader* activeFractal = &mandelbrot;
 
     bool fractalSelector;
+    bool colorSelector;
 
     Texture2D texture;
 

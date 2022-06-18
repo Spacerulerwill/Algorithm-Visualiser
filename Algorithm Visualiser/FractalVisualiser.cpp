@@ -75,6 +75,8 @@ void FractalVisualiser::draw()
     ImGui::SliderFloat("Color 2", &color_2, 0.0f, 1.0f, "% .3f");
     ImGui::SliderFloat("Color 3", &color_3, 0.0f, 1.0f, "% .3f");
     ImGui::SliderFloat("Color 4", &color_4, 0.0f, 1.0f, "% .3f");
+
+    colorSelector = ImGui::Combo("Color Preset", &selectedColorPreset, colorPresetNames, 4);
     ImGui::End();
 
     SetShaderValue(*activeFractal, color_1Loc, &color_1, SHADER_UNIFORM_FLOAT);
@@ -154,6 +156,12 @@ void FractalVisualiser::keyEvents()
             break;
         }
         }
+    }
+    if (colorSelector) {
+        color_1 = colorPresets[selectedColorPreset][0];
+        color_2 = colorPresets[selectedColorPreset][1];
+        color_3 = colorPresets[selectedColorPreset][2];
+        color_4 = colorPresets[selectedColorPreset][3];
     }
 }
 
