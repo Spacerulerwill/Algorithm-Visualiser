@@ -3,12 +3,13 @@
 #include "imgui_impl_raylib.h"
 #include "imgui_internal.h"
 #include "rlImGui.h"
+#include <fstream>
 #include <thread>
 #include <random>
 #include <sstream>
+#include <vector>
 
 // LOGIC
-
 SortingVisualiser::SortingVisualiser(float xRatio, float yRatio, float widthRatio, float heightRatio) : ScreenElement(xRatio, yRatio, widthRatio, heightRatio)
 {
 	//initialise random seed
@@ -18,36 +19,45 @@ SortingVisualiser::SortingVisualiser(float xRatio, float yRatio, float widthRati
 	for (int i = 0; i < vectorSize; i++)
 		arr.push_back(rand() % maxValue + 1);
 
-	//set to not sorting
+	//set to not sorting, staircase mode, and activate bubble sort
 	state = State::IDLE;
 	style = Style::STAIRCASE;
 	setSort(Sorts::BUBBLE);
 }
 
+//changing sort algorithm
 void SortingVisualiser::setSort(Sorts newSort) {
+	std::ifstream ifs;
 	sort = newSort;
 	switch (sort) {
 	case Sorts::BUBBLE: {
 		title = "Bubble Sort - O(n^2)";
 		sortFunction = std::bind(&SortingVisualiser::bubbleSort, this, std::placeholders::_1);
+		ifs = std::ifstream("info/bubblesort.txt"); // read info from file
 		break;
 	}
 	case Sorts::INSERTION: {
 		title = "Insertion Sort - O(n^2)";
-		sortFunction = std::bind(&SortingVisualiser::insertionSort, this, std::placeholders::_1);;
+		sortFunction = std::bind(&SortingVisualiser::insertionSort, this, std::placeholders::_1);
+		ifs = std::ifstream("info/insertionsort.txt"); // read info from file
 		break;
 	}
 	case Sorts::SELECTION: {
 		title = "Selection Sort - O(n^2)";
 		sortFunction = std::bind(&SortingVisualiser::selectionSort, this, std::placeholders::_1);
+		ifs = std::ifstream("info/selectionsort.txt"); // read info from file
 		break;
 	}
 	case Sorts::COUNT: {
 		title = "Counting Sort - O(n+k)";
 		sortFunction = std::bind(&SortingVisualiser::countingSort, this, std::placeholders::_1);
+		ifs = std::ifstream("info/countingsort.txt"); // read info from file
 		break;
 	}
 	}
+	//set new informationt text
+	informationText = std::string((std::istreambuf_iterator<char>(ifs)),
+		(std::istreambuf_iterator<char>()));
 }
 
 //start sort
@@ -61,6 +71,7 @@ void SortingVisualiser::executeSort(std::function<void(std::vector<int>&)> sort)
 	// start a thread;
 	sort(arr);
 
+	//set idle
 	state = State::IDLE;
 
 	//go through once more and check it again. Highlight them green as you to check if sorted
@@ -72,6 +83,7 @@ void SortingVisualiser::executeSort(std::function<void(std::vector<int>&)> sort)
 	state = State::IDLE;
 }
 
+// start the sort thread execution
 void SortingVisualiser::startSortThread() {
 	if (state == State::IDLE) {
 		std::thread th(&SortingVisualiser::executeSort, this, sortFunction);
@@ -124,7 +136,8 @@ void SortingVisualiser::drawSidebar() {
 	
 	ImGui::PushItemFlag(ImGuiItemFlags_Disabled, !(state == State::IDLE)); // disable controls if sorting
 	ImGui::Text("Select Algorithm");
-	algorithmSelector = ImGui::Combo("##", &algorithmIndex, sortOptions, 3);
+	ImGui::PushItemWidth(ImGui::GetWindowWidth() - ImGui::GetStyle().FramePadding.x * 4);
+	algorithmSelector = ImGui::Combo("##", &algorithmIndex, sortOptions, 4);
 	ImGui::PopItemFlag();
 
 	ImGui::EndChild();
@@ -167,6 +180,8 @@ void SortingVisualiser::drawSidebar() {
 
 	ImGui::Text("Information");
 
+	ImGui::TextWrapped(informationText.c_str());
+
 	ImGui::EndChild();
 
 	ImGui::End();
@@ -182,7 +197,14 @@ void SortingVisualiser::drawBars()
 
 		for (int i = 0; i < vectorSize; i++) {
 			//white by default
-			Color color = WHITE;
+			Color color;
+
+			if (i == indexAccessing) {
+				color = RED;
+			}
+			else {
+				color = WHITE;
+			}
 			//height of bar relative to screen height
 			float height = (arr[i] / (float)maxValue) * (getHeight() * 0.75);
 
@@ -199,7 +221,14 @@ void SortingVisualiser::drawBars()
 		float barHeight = getHeight() / vectorSize;
 
 		for (int i = 0; i < vectorSize; i++) {
-			Color color = WHITE;
+			Color color;
+
+			if (i == indexAccessing) {
+				color = RED;
+			}
+			else {
+				color = WHITE;
+			}
 
 			//height of bar relative to screen height
 			float width = (arr[i] / (float)maxValue) * (getWidth() * 0.75);
@@ -221,9 +250,14 @@ void SortingVisualiser::drawBars()
 		float angle = 360.0f / vectorSize;
 
 		for (int i = 0; i < vectorSize; i++) {
+			Color color;
 
-			Color color = ColorFromHSV(arr[i] * (360.0f / maxValue), 1.0f, 1.0f);
-
+			if (i == indexAccessing) {
+				color = BLACK;
+			}
+			else {
+				color = ColorFromHSV(arr[i] * (360.0f / maxValue), 1.0f, 1.0f);
+			}
 			DrawCircleSector(center, radius, i * angle, (i +1) * angle, 0, color);
 		}
 		break;
@@ -289,6 +323,7 @@ void SortingVisualiser::bubbleSort(std::vector<int>& arr)
 	int i, j;
 	for (i = 0; i < arr.size() - 1; i++) {
 		for (j = 0; j < arr.size() - i - 1; j++) {
+			indexAccessing = j;
 			std::this_thread::sleep_for(std::chrono::nanoseconds(nsDelay));
 			comparisonsMade++;
 			arrayAccesses += 2;
@@ -303,6 +338,7 @@ void SortingVisualiser::bubbleSort(std::vector<int>& arr)
 			break;
 		}
 	}
+	indexAccessing = -1;
 }
 
 void SortingVisualiser::insertionSort(std::vector<int>& arr)
@@ -319,6 +355,7 @@ void SortingVisualiser::insertionSort(std::vector<int>& arr)
 
 		while (j >= 0 && arr[j] > key)
 		{
+			indexAccessing = j;
 			comparisonsMade++;
 			arrayAccesses += 2;
 
@@ -330,6 +367,7 @@ void SortingVisualiser::insertionSort(std::vector<int>& arr)
 		arr[j + 1] = key;
 		arrayAccesses++;
 	}
+	indexAccessing = -1;
 }
 
 void SortingVisualiser::selectionSort(std::vector<int>& arr)
@@ -337,6 +375,7 @@ void SortingVisualiser::selectionSort(std::vector<int>& arr)
 	for (int step = 0; step < arr.size() - 1; step++) {
 		int min_idx = step;
 		for (int i = step + 1; i < arr.size(); i++) {
+			indexAccessing = i;
 			std::this_thread::sleep_for(std::chrono::nanoseconds(nsDelay));
 			comparisonsMade++;
 			arrayAccesses += 2;
@@ -350,9 +389,47 @@ void SortingVisualiser::selectionSort(std::vector<int>& arr)
 		std::swap(arr[min_idx], arr[step]);
 		swapsMade++;
 	}
+	indexAccessing = -1;
 }
 
 void SortingVisualiser::countingSort(std::vector<int>& arr)
 {
-	
+	//first pass, determine minimum and maximum elements
+	int min = arr[0];
+	int max = arr[0];
+	for (int i = 0; i < arr.size(); i++) {
+		indexAccessing = i;
+		if (arr[i] > max) max = arr[i];
+		if (arr[i] < min) min = arr[i];
+		std::this_thread::sleep_for(std::chrono::nanoseconds(nsDelay));
+	}
+
+	//create count array of size of max-min
+	std::vector<int> count(max-min+1,0);
+	std::cout << count[0];
+
+	//iterate through once again, incrementing elements in count array
+	for (int i = 0; i < arr.size(); i++) {
+		indexAccessing = i;
+		count[arr[i] - min] += 1;				
+		std::this_thread::sleep_for(std::chrono::nanoseconds(nsDelay));
+	}
+
+	//construct new vector
+	std::vector<int> newArr;
+
+	//reconstruct
+	for (int value = 0; value < count.size(); value++) {
+		for (int j = 0; j < count[value]; j++) {
+			newArr.push_back(value);
+		}
+	}
+
+	//replace old arr with new arr
+	for (int i = 0; i < arr.size(); i++) {
+		arr[i] = newArr[i];
+		indexAccessing = i;
+		std::this_thread::sleep_for(std::chrono::nanoseconds(nsDelay));
+	}
+	indexAccessing = -1;
 }

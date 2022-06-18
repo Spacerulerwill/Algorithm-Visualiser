@@ -10,9 +10,9 @@
 
 FractalVisualiser::FractalVisualiser(float xRatio, float yRatio, float widthRatio, float heightRatio) : ScreenElement(xRatio, yRatio, widthRatio, heightRatio)
 {
-	mandelbrot = LoadShader(0, TextFormat("mandelbrot.fs", GLSL_VERSION));
-    burningShip = LoadShader(0, TextFormat("burningship.fs", GLSL_VERSION));
-    tricorn = LoadShader(0, TextFormat("tricorn.fs", GLSL_VERSION));
+	mandelbrot = LoadShader(0, TextFormat("shaders/mandelbrot.fs", GLSL_VERSION));
+    burningShip = LoadShader(0, TextFormat("shaders/burningship.fs", GLSL_VERSION));
+    tricorn = LoadShader(0, TextFormat("shaders/tricorn.fs", GLSL_VERSION));
 
     Image imBlank = GenImageColor(getWidth(), getHeight(), BLANK);
     texture = LoadTextureFromImage(imBlank);  // Load blank texture to fill on shader
@@ -44,15 +44,6 @@ void FractalVisualiser::draw()
 
     if (juliaMode) {
         stream << mousePos.x << "  + " << -mousePos.y << "i\n";
-    }
-    else {
-        stream << -location[0] << " + " << -location[1] << "i\n";
-    }
-
-    stream << zoom << "x zoom\n";
-    stream << "J - toggle Julia Set mode\n";
-
-    if (juliaMode) {
         if (juliaFrozen) {
             stream << "Enter - unfreeze Julia Set\n";
         }
@@ -61,6 +52,14 @@ void FractalVisualiser::draw()
         }
         stream << "S - save image\n";
     }
+    else {
+        stream << -location[0] << " + " << -location[1] << "i\n";
+        stream << "R - reset\n";
+    }
+
+    stream << "J - toggle Julia Set mode\n";
+    stream << zoom << "x zoom\n";
+
 
     std::string s = stream.str();
     const char* text = s.c_str();
@@ -112,6 +111,11 @@ void FractalVisualiser::keyEvents()
         Image image = LoadImageFromScreen();
         ExportImage(image, "fractal.png");
         UnloadImage(image);
+    }
+    if (IsKeyPressed(KEY_R)) {
+        location[0] = 0;
+        location[1] = 0;
+        zoom = 2.0f;
     }
     if (IsKeyPressed(KEY_ENTER) && juliaMode) {
         juliaFrozen = !juliaFrozen; //pause or resume julia set

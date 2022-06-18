@@ -141,12 +141,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="burningship.fs" />
-    <None Include="julia.fs" />
-    <None Include="mandelbrot.fs" />
-    <None Include="tricorn.fs" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="FractalVisualiser.cpp" />
     <ClCompile Include="imgui_impl_raylib.cpp" />
     <ClCompile Include="main.cpp" />
@@ -159,6 +153,11 @@
     <ClInclude Include="Program.h" />
     <ClInclude Include="ScreenElement.h" />
     <ClInclude Include="SortingVisualiser.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\burningship.fs" />
+    <None Include="shaders\mandelbrot.fs" />
+    <None Include="shaders\tricorn.fs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

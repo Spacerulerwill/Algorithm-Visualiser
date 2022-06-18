@@ -42,7 +42,7 @@ private:
 	int comparisonsMade = 0;
 	int swapsMade = 0;
 	int arrayAccesses = 0;
-	bool colorMode = false;
+	int indexAccessing = -1;
 
 	//menu bar options
 	bool algorithmSelector;
@@ -54,7 +54,9 @@ private:
 
 	int algorithmIndex = 0;
 
-	const char * sortOptions[3] = {"Bubble Sort O(n^2)", "Insertion Sort O(n^2)", "Selection Sort O(n^2)"};
+	const char * sortOptions[4] = {"Bubble Sort O(n^2)", "Insertion Sort O(n^2)", "Selection Sort O(n^2)", "Counting Sort O(n+k)"};
+
+	std::string informationText;
 	
 	//drawing functions
 	void drawBars();

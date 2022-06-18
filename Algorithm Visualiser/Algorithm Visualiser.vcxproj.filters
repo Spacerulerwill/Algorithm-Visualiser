@@ -15,20 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="burningship.fs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="tricorn.fs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="mandelbrot.fs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="julia.fs">
-      <Filter>Source Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="FractalVisualiser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -61,5 +47,16 @@
     <ClInclude Include="SortingVisualiser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\burningship.fs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="shaders\mandelbrot.fs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="shaders\tricorn.fs">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

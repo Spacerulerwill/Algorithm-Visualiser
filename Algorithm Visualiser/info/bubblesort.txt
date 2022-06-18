@@ -1,0 +1,5 @@
+Bubble Sort is a simple, inefficient comparitive sorting algorithm rarely used in real world applications. It is mainly a educational algorithm to help students understand what a sorting algorithm does, due to its simplicity. It sorts by repeatedly iterating through the list, comparing adjacent elements and swapping them if they are in the wrong order. It repeats this until no swaps are made, and therefore the list is sorted.
+
+It runs in O(n^2) worst and average case, and O(n) if the list is already sorted. It is out performed by pretty much all other O(n^2) sorts, such as Insertion and Selection sort, which are about the same in complexity.
+
+This sort is best used to check if a list is already sorted, or to sort very small lists. For larger lists another sort is a better option.

@@ -25,8 +25,11 @@ Program::Program()
 	// FPS
 	SetTargetFPS(FPS);
 
+	//initialise intialiser modules
 	sortVisualiser = new SortingVisualiser(0.0f, 0.0f, 0.875f, 1.0f);
 	fractalVisualiser = new FractalVisualiser(0.0f, 0.0f, 1.0f, 1.0f);
+
+	//set active visualiser to sort visualiser
 	activeVisualiser = sortVisualiser;
 
 	//execution loop
@@ -34,8 +37,9 @@ Program::Program()
 		BeginDrawing();
 		BeginRLImGui();
 
-		ClearBackground(BLACK);
-
+		ClearBackground(BLACK); // clear background
+		
+		//switching algorithm type logic
 		if (algorithmTypeSelector) {
 			switch (selectedAlgorithmType) {
 			case 0: {
@@ -49,14 +53,15 @@ Program::Program()
 			}
 		}
 
-		drawAlgorithmSelector();
 
-		activeVisualiser->update();
+		drawAlgorithmSelector(); // draw algorithm selector ImGui widget
+		activeVisualiser->update(); // update active visualiser
 
 		EndRLImGui();
 		EndDrawing();
 	}
 
+	//closing raylib and ImGui
 	ShutdownRLImGui();
 	ImGui::DestroyContext();
 	CloseWindow();
@@ -68,11 +73,13 @@ Program::Program()
 
 void Program::drawAlgorithmSelector()
 {
+	//create algorithm selector, size it and place it
 	ImGui::SetNextWindowPos(ImVec2{GetScreenWidth() - ImGui::GetWindowWidth() - (GetScreenWidth() * (1 / 8.0f)),0}, ImGuiCond_Once);
 	ImGui::SetNextWindowSize(ImVec2{ImGui::GetWindowWidth(), 0});
 
 	ImGui::Begin("Algorithm", NULL);
 
+	//drop down menu for all the algorithm types
 	algorithmTypeSelector = ImGui::Combo("Algorithm Type", &selectedAlgorithmType, algorithmTypes, 5);
 	
 	ImGui::End();
