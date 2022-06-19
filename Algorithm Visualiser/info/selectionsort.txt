@@ -1,0 +1,21 @@
+Selection Sort is a comparative, in-place sorting Algorithm
+
+Time Complexity:
+
+All cases - O(n^2)
+
+How It Works:
+
+This algorithm divides the list into 2 parts: A sorted part from left to right at the front of the list and another part of the  remaining unsorted items that occupy the rest of the list. The sorted part is initially empty and the unsorted part is all the elements in the list. 
+
+The algorithm repeatedly iterates over the unsorted sublist, finding the smallest element each time and swaps it with the left most unsorted element.
+
+Advantages:
+
+Simple to implement
+Fast for small lists
+Faster than Bubble Sort, whilst not being that much more complex
+
+Disadvantages:
+
+Inefficient on larger lists

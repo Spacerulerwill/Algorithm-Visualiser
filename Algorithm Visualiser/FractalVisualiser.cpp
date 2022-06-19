@@ -109,9 +109,20 @@ void FractalVisualiser::keyEvents()
         juliaMode = !juliaMode;
     }
     if (IsKeyPressed(KEY_S)) {
-        //must update
+        //string stream for name
+        std::stringstream stream;
+        if (juliaMode) {
+            stream << fractals[selectedFractal] << " Julia Set at " << mousePos.x << " + " << -mousePos.y << "i.png";
+        }
+        else {
+            stream << fractals[selectedFractal] << " at " << - location[0] << " + " << -location[1] << "i.png";
+        }
+
+        std::string s = stream.str();
+        const char* name = s.c_str();
+
         Image image = LoadImageFromScreen();
-        ExportImage(image, "fractal.png");
+        ExportImage(image, name);
         UnloadImage(image);
     }
     if (IsKeyPressed(KEY_R)) {

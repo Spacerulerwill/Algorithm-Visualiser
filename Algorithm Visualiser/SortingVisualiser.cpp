@@ -179,6 +179,7 @@ void SortingVisualiser::drawSidebar() {
 	ImGui::BeginChild("Information", ImVec2{ width,height * (2 / 3.0f) * (18.5f/20.0f)}, true, ImGuiWindowFlags_ChildWindow);
 
 	ImGui::Text("Information");
+	ImGui::NewLine();
 
 	ImGui::TextWrapped(informationText.c_str());
 

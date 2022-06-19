@@ -42,7 +42,7 @@ private:
     float zoom = 2.0f;
 
     int selectedFractal = 0;
-    const char* fractals[3] = { "Mandelbrot Set", "Burning Ship Fractal", "Tricorn"};
+    const char* fractals[3] = { "Mandelbrot", "Burning Ship", "Tricorn"};
 
     // preset color schemes
     int selectedColorPreset = 0;

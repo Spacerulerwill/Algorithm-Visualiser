@@ -1,0 +1,22 @@
+Counting Sort is a non-comparative, not in-place sorting Algorithm and requires auxiliary space
+
+Time Complexity:
+
+All cases - O(n+k) where n is the number of elements and k is the element range
+
+How It Works:
+
+The array is iterated through, and  the minimum and maximum element are determined. A count array is then created with the size of the range with all values initialised to 0. This is to store the numbers of occurrences of each element.
+
+It is then iterated through again, this time for each element incrementing the correct index in the count array.
+
+Then finally a new array is constructed using the information stored in the count array.
+
+Advantages:
+
+Linear time
+Works very fast when the range of elements does not exceed the amount of elements.
+
+Disadvantages:
+
+Inefficient when the range elements is significantly larger than the amount of elements
