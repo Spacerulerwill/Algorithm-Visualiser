@@ -19,3 +19,4 @@ Faster than Bubble Sort, whilst not being that much more complex
 Disadvantages:
 
 Inefficient on larger lists
+Still runs in O(n^2) time if the list is already sorted, the only O(n^2) sort to do so
