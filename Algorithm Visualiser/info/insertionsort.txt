@@ -1,0 +1,22 @@
+Insertion Sort is a comparative, in-place sorting algorithm
+
+Time complexity:
+
+Worst Case - O(n^2)
+Average Case - O(n^2)
+Best Case- O(n) if the list is already sorted
+
+How It Works:
+
+The first element is assumed to be sorted. The second element is stored in a variable called Key. If the first element is greater than Key, they are swapped. This repeats down the list until one the Key finds an element that is smaller than it or it gets to the start of the list.
+
+Then the 3rd element becomes the Key and this process is repeated.
+
+Advantages:
+
+Fast for small lists
+Fastest of the O(n^2) sorts
+
+Disadvantages:
+
+Inefficient for larger lists
