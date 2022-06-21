@@ -462,6 +462,7 @@ void SortingVisualiser::quickSort(std::vector<int>& arr, int low, int high)
 		quickSort(arr, pivot_location + 1, high);
 		sleepSort;
 	}
+	indexAccessing = -1;
 }
 
 
@@ -470,7 +471,8 @@ int SortingVisualiser::quickSortPartition(std::vector<int>& arr, int low, int hi
 	int pivot = arr[low];
 	int leftwall = low;
 
-	for (int i = low + 1; i < high; i++) {
+	for (int i = low + 1; i <= high; i++) {
+		indexAccessing = i;
 		if (arr[i] < pivot) {
 			std::swap(arr[i], arr[leftwall]);
 			sleepSort;
