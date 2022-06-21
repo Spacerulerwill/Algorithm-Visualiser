@@ -21,7 +21,7 @@ private:
 
 	//state enum class
 	enum class State { SORTING, CHECKING, IDLE };
-	enum class Sorts { BUBBLE, INSERTION, SELECTION, COUNT };
+	enum class Sorts { BUBBLE, INSERTION, SELECTION, COUNT, QUICK };
 	enum class Style { STAIRCASE, PRYAMID, CIRCLE};
 
 	//enums
@@ -54,7 +54,7 @@ private:
 
 	int algorithmIndex = 0;
 
-	const char * sortOptions[4] = {"Bubble Sort O(n^2)", "Insertion Sort O(n^2)", "Selection Sort O(n^2)", "Counting Sort O(n+k)"};
+	const char * sortOptions[5] = {"Bubble Sort O(n^2)", "Insertion Sort O(n^2)", "Selection Sort O(n^2)", "Counting Sort O(n+k)", "Quick Sort O(nlogn)"};
 
 	std::string informationText;
 	
@@ -73,5 +73,9 @@ private:
 	void insertionSort(std::vector<int>& arr);
 	void selectionSort(std::vector<int>& arr);
 	void countingSort(std::vector<int>& arr);
+	void startQuickSort(std::vector<int>& arr);
+	void quickSort(std::vector<int>& arr, int low, int high);
+	int quickSortPartition(std::vector<int>& arr, int low, int high);
+	
 };
 

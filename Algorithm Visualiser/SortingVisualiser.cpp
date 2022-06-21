@@ -9,6 +9,9 @@
 #include <sstream>
 #include <vector>
 
+#define sleepSort std::this_thread::sleep_for(std::chrono::nanoseconds(nsDelay));
+
+
 // LOGIC
 SortingVisualiser::SortingVisualiser(float xRatio, float yRatio, float widthRatio, float heightRatio) : ScreenElement(xRatio, yRatio, widthRatio, heightRatio)
 {
@@ -53,6 +56,11 @@ void SortingVisualiser::setSort(Sorts newSort) {
 		sortFunction = std::bind(&SortingVisualiser::countingSort, this, std::placeholders::_1);
 		ifs = std::ifstream("info/countingsort.txt"); // read info from file
 		break;
+	}
+	case Sorts::QUICK: {
+		title = "Quick Sort - O(nlogn)";
+		sortFunction = std::bind(&SortingVisualiser::startQuickSort, this, std::placeholders::_1);
+		ifs = std::ifstream("info/quicksort.txt");
 	}
 	}
 	//set new informationt text
@@ -137,7 +145,7 @@ void SortingVisualiser::drawSidebar() {
 	ImGui::PushItemFlag(ImGuiItemFlags_Disabled, !(state == State::IDLE)); // disable controls if sorting
 	ImGui::Text("Select Algorithm");
 	ImGui::PushItemWidth(ImGui::GetWindowWidth() - ImGui::GetStyle().FramePadding.x * 4);
-	algorithmSelector = ImGui::Combo("##", &algorithmIndex, sortOptions, 4);
+	algorithmSelector = ImGui::Combo("##", &algorithmIndex, sortOptions, 5);
 	ImGui::PopItemFlag();
 
 	ImGui::EndChild();
@@ -325,12 +333,12 @@ void SortingVisualiser::bubbleSort(std::vector<int>& arr)
 	for (i = 0; i < arr.size() - 1; i++) {
 		for (j = 0; j < arr.size() - i - 1; j++) {
 			indexAccessing = j;
-			std::this_thread::sleep_for(std::chrono::nanoseconds(nsDelay));
+			sleepSort;
 			comparisonsMade++;
 			arrayAccesses += 2;
 			if (arr[j] > arr[j + 1]) {
 				arrayAccesses += 2;
-				std::this_thread::sleep_for(std::chrono::nanoseconds(nsDelay));
+				sleepSort;
 				std::swap(arr[j], arr[j + 1]);
 				swapsMade++;
 			}
@@ -352,7 +360,7 @@ void SortingVisualiser::insertionSort(std::vector<int>& arr)
 		key = arr[i];
 		arrayAccesses++;
 		j = i - 1;
-		std::this_thread::sleep_for(std::chrono::nanoseconds(nsDelay));
+		sleepSort;
 
 		while (j >= 0 && arr[j] > key)
 		{
@@ -360,7 +368,7 @@ void SortingVisualiser::insertionSort(std::vector<int>& arr)
 			comparisonsMade++;
 			arrayAccesses += 2;
 
-			std::this_thread::sleep_for(std::chrono::nanoseconds(nsDelay));
+			sleepSort;
 			swapsMade++;
 			arr[j + 1] = arr[j];
 			j = j - 1;
@@ -377,14 +385,14 @@ void SortingVisualiser::selectionSort(std::vector<int>& arr)
 		int min_idx = step;
 		for (int i = step + 1; i < arr.size(); i++) {
 			indexAccessing = i;
-			std::this_thread::sleep_for(std::chrono::nanoseconds(nsDelay));
-			comparisonsMade++;
+			sleepSort;
 			arrayAccesses += 2;
 			if (arr[i] < arr[min_idx]) {
 				min_idx = i;
-				std::this_thread::sleep_for(std::chrono::nanoseconds(nsDelay));
+				sleepSort;
 
 			}
+			comparisonsMade++;
 		}
 		// put min at the correct position
 		std::swap(arr[min_idx], arr[step]);
@@ -399,10 +407,11 @@ void SortingVisualiser::countingSort(std::vector<int>& arr)
 	int min = arr[0];
 	int max = arr[0];
 	for (int i = 0; i < arr.size(); i++) {
+		arrayAccesses++;
 		indexAccessing = i;
 		if (arr[i] > max) max = arr[i];
 		if (arr[i] < min) min = arr[i];
-		std::this_thread::sleep_for(std::chrono::nanoseconds(nsDelay));
+		sleepSort;
 	}
 
 	//create count array of size of max-min
@@ -411,9 +420,10 @@ void SortingVisualiser::countingSort(std::vector<int>& arr)
 
 	//iterate through once again, incrementing elements in count array
 	for (int i = 0; i < arr.size(); i++) {
+		arrayAccesses++;
 		indexAccessing = i;
 		count[arr[i] - min] += 1;				
-		std::this_thread::sleep_for(std::chrono::nanoseconds(nsDelay));
+		sleepSort;
 	}
 
 	//construct new vector
@@ -428,9 +438,47 @@ void SortingVisualiser::countingSort(std::vector<int>& arr)
 
 	//replace old arr with new arr
 	for (int i = 0; i < arr.size(); i++) {
+		arrayAccesses++;
 		arr[i] = newArr[i];
 		indexAccessing = i;
-		std::this_thread::sleep_for(std::chrono::nanoseconds(nsDelay));
+		sleepSort;
 	}
 	indexAccessing = -1;
+}
+
+void SortingVisualiser::startQuickSort(std::vector<int>& arr)
+{
+	int low = 0;
+	int high = arr.size()-1;
+	 
+	quickSort(arr, low, high);
+}
+
+void SortingVisualiser::quickSort(std::vector<int>& arr, int low, int high)
+{
+	if (low < high) {
+		int pivot_location = quickSortPartition(arr, low, high);
+		quickSort(arr, low, pivot_location);
+		quickSort(arr, pivot_location + 1, high);
+		sleepSort;
+	}
+}
+
+
+int SortingVisualiser::quickSortPartition(std::vector<int>& arr, int low, int high)
+{
+	int pivot = arr[low];
+	int leftwall = low;
+
+	for (int i = low + 1; i < high; i++) {
+		if (arr[i] < pivot) {
+			std::swap(arr[i], arr[leftwall]);
+			sleepSort;
+			leftwall += 1;
+		}
+	}
+	sleepSort;
+	std::swap(pivot, arr[leftwall]);
+
+	return leftwall;
 }
