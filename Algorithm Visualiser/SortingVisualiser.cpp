@@ -469,18 +469,23 @@ void SortingVisualiser::quickSort(std::vector<int>& arr, int low, int high)
 int SortingVisualiser::quickSortPartition(std::vector<int>& arr, int low, int high)
 {
 	int pivot = arr[low];
+	arrayAccesses++;
 	int leftwall = low;
 
 	for (int i = low + 1; i <= high; i++) {
 		indexAccessing = i;
 		if (arr[i] < pivot) {
+			arrayAccesses++;
 			std::swap(arr[i], arr[leftwall]);
+			swapsMade++;
 			sleepSort;
 			leftwall += 1;
 		}
+		comparisonsMade++;
 	}
 	sleepSort;
 	std::swap(pivot, arr[leftwall]);
+	swapsMade++;
 
 	return leftwall;
 }

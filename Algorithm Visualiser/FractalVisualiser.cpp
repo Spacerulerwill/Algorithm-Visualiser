@@ -93,10 +93,10 @@ void FractalVisualiser::draw()
 
     if (!juliaFrozen) {
         //map mouse coordinate to mandelbrot point
-        float minR = (-1 * getWidth() / getHeight());
-        float maxR = (getWidth() / getHeight());
-        float minI = -1;
-        float maxI = 1;
+        float minR = ((-0.5 * getWidth() / getHeight()) * zoom) - location[0];
+        float maxR = ((0.5 * getWidth() / getHeight()) * zoom) - location[0];
+        float minI = -0.5 * zoom + location[1];
+        float maxI = 0.5 * zoom + location[1];
         mousePos = Vector2{ mapToReal(GetMousePosition().x, minR, maxR), mapToImaginary(GetMousePosition().y, minI, maxI)};
     }
 
