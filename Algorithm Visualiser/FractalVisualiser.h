@@ -35,12 +35,11 @@ private:
     int iterations = 100;
     float resolution[2] = {getWidth(), getHeight()};
     float location[2] = {0.0f, 0.0f };
+    float zoom = 2.0f;
 
     Vector2 mousePos = {0,0};
     bool juliaMode = false;
     bool stabilityVisualiser = false;
-
-    float zoom = 2.0f;
 
     int selectedFractal = 0;
     const char* fractals[3] = { "Mandelbrot", "Burning Ship", "Tricorn"};
@@ -50,6 +49,7 @@ private:
     const char* colorPresetNames[4] = {"Default", "Electric Blue", "Blood Red", "Neon Green"};
     const float colorPresets[4][4] = { {0.0, 0.0, 0.0, 0.0}, {0.109, 0.134, 0.144, 0.791}, {0.199, 0.159, 0.164, 1.0}, {1.0, 0.308, 0.194, 1.0} };
 
+    //fractal shaders
     Shader mandelbrot;
     Shader burningShip;
     Shader tricorn;
@@ -58,8 +58,9 @@ private:
     bool fractalSelector;
     bool colorSelector;
 
-    Texture2D texture;
+    Texture2D texture; //texture to draw to
 
+    // fractal functions
     void setFractal(Shader& shader);
     float mapToReal(float x, float minR, float maxR);
     float mapToImaginary(float x, float minI, float maxI);

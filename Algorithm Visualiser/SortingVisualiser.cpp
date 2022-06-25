@@ -9,10 +9,10 @@
 #include <sstream>
 #include <vector>
 
+//pause sorting process for nsDelay nanoseconds
 #define sleepSort std::this_thread::sleep_for(std::chrono::nanoseconds(nsDelay));
 
-
-// LOGIC
+//constructor
 SortingVisualiser::SortingVisualiser(float xRatio, float yRatio, float widthRatio, float heightRatio) : ScreenElement(xRatio, yRatio, widthRatio, heightRatio)
 {
 	//initialise random seed
@@ -30,7 +30,7 @@ SortingVisualiser::SortingVisualiser(float xRatio, float yRatio, float widthRati
 
 //changing sort algorithm
 void SortingVisualiser::setSort(Sorts newSort) {
-	std::ifstream ifs;
+	std::ifstream ifs; //input stream
 	sort = newSort;
 	switch (sort) {
 	case Sorts::BUBBLE: {
@@ -71,6 +71,7 @@ void SortingVisualiser::setSort(Sorts newSort) {
 //start sort
 void SortingVisualiser::executeSort(std::function<void(std::vector<int>&)> sort)
 {
+	//set values to default
 	state = State::SORTING;
 	comparisonsMade = 0;
 	swapsMade = 0;
@@ -128,6 +129,7 @@ void SortingVisualiser::draw() {
 	drawSidebar();
 }
 
+//draw sidebar panel
 void SortingVisualiser::drawSidebar() {
 	ImGui::SetNextWindowPos(ImVec2{ GetScreenWidth() - (GetScreenWidth() / 8.0f),0.0f });
 	ImGui::SetNextWindowSize(ImVec2{ GetScreenWidth() / 8.0f,(float)GetScreenHeight() });
@@ -292,8 +294,10 @@ void SortingVisualiser::drawText()
 	DrawText(text, 0, 0, font, WHITE);
 }
 
+//key events
 void SortingVisualiser::keyEvents() {
 	if (state == State::IDLE) {
+		// shuffle vector
 		if (IsKeyPressed(KEY_SPACE) || randomButton)
 			std::shuffle(std::begin(arr), std::end(arr), std::default_random_engine());
 	}

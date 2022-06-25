@@ -135,11 +135,13 @@ void FractalVisualiser::draw()
         }
     }
 
+    //set mousepos shader value
     SetShaderValue(*activeFractal, mousePosLoc, &mousePos, SHADER_UNIFORM_VEC2);
 }
 	
 void FractalVisualiser::keyEvents()
 {
+    //save fractal image
     if (IsKeyPressed(KEY_S)) {
         //string stream for name
         std::stringstream stream;
@@ -153,15 +155,18 @@ void FractalVisualiser::keyEvents()
         std::string s = stream.str();
         const char* name = s.c_str();
 
+        //save
         Image image = LoadImageFromScreen();
         ExportImage(image, name);
         UnloadImage(image);
     }
     if (IsKeyPressed(KEY_R)) {
+        //change zoom to default and move back to center
         location[0] = 0;
         location[1] = 0;
         zoom = 2.0f;
     }
+    //panning controls
     if (IsKeyDown(KEY_DOWN)) {
         location[1] += 0.01 * zoom;
     }
@@ -174,6 +179,8 @@ void FractalVisualiser::keyEvents()
     if (IsKeyDown(KEY_RIGHT)) {
         location[0] -= 0.01 * zoom;
     }
+
+    //zooming in
     if (IsKeyDown(KEY_EQUAL) && zoom >= 0) {
         zoom -= 0.01 * zoom;
     }
@@ -197,6 +204,7 @@ void FractalVisualiser::keyEvents()
         }
         }
     }
+    //changing colors
     if (colorSelector) {
         color_1 = colorPresets[selectedColorPreset][0];
         color_2 = colorPresets[selectedColorPreset][1];
