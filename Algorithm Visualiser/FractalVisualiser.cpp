@@ -3,8 +3,10 @@
 #include "imgui_impl_raylib.h"
 #include "imgui_internal.h"
 #include "rlImGui.h"
+#include "raymath.h"
 #include <sstream>
 #include <thread>
+#include <iostream>
 
 #define GLSL_VERSION 450
 
@@ -31,6 +33,7 @@ float FractalVisualiser::mapToImaginary(float y, float minI, float maxI) {
     return y * (range / getHeight()) + minI;
 }
 
+
 void FractalVisualiser::draw()
 {  
     BeginShaderMode(*activeFractal);
@@ -44,22 +47,14 @@ void FractalVisualiser::draw()
 
     if (juliaMode) {
         stream << mousePos.x << "  + " << -mousePos.y << "i\n";
-        if (juliaFrozen) {
-            stream << "Enter - unfreeze Julia Set\n";
-        }
-        else {
-            stream << "Enter - freeze Julia Set\n";
-        }
         stream << "S - save image\n";
     }
     else {
+        stream << "+/= Zoom\nArrow keys - Pan\n";
+        stream << zoom << "x zoom\n";
         stream << -location[0] << " + " << -location[1] << "i\n";
         stream << "R - reset\n";
     }
-
-    stream << "J - toggle Julia Set mode\n";
-    stream << zoom << "x zoom\n";
-
 
     std::string s = stream.str();
     const char* text = s.c_str();
@@ -77,8 +72,16 @@ void FractalVisualiser::draw()
     ImGui::SliderFloat("Color 4", &color_4, 0.0f, 1.0f, "% .3f");
 
     colorSelector = ImGui::Combo("Color Preset", &selectedColorPreset, colorPresetNames, 4);
+
+    ImGui::Checkbox("Julia Set", &juliaMode);
+
+    ImGui::Checkbox("Stabiliy Visualiser", &stabilityVisualiser);
+
+    //std::cout << juliaMode << " " << stabilityVisualiser << "\n";
+
     ImGui::End();
 
+    SetShaderValue(*activeFractal, juliaModeLoc, &juliaMode, SHADER_UNIFORM_INT);
     SetShaderValue(*activeFractal, color_1Loc, &color_1, SHADER_UNIFORM_FLOAT);
     SetShaderValue(*activeFractal, color_2Loc, &color_2, SHADER_UNIFORM_FLOAT);
     SetShaderValue(*activeFractal, color_3Loc, &color_3, SHADER_UNIFORM_FLOAT);
@@ -89,15 +92,47 @@ void FractalVisualiser::draw()
     resolution[0] = getWidth();
     resolution[1] = getHeight();
     SetShaderValue(*activeFractal, resolutionLoc, &resolution, SHADER_UNIFORM_VEC2);
-    SetShaderValue(*activeFractal, juliaModeLoc, &juliaMode, SHADER_UNIFORM_INT);
 
-    if (!juliaFrozen) {
-        //map mouse coordinate to mandelbrot point
-        float minR = ((-0.5 * getWidth() / getHeight()) * zoom) - location[0];
-        float maxR = ((0.5 * getWidth() / getHeight()) * zoom) - location[0];
-        float minI = -0.5 * zoom + location[1];
-        float maxI = 0.5 * zoom + location[1];
-        mousePos = Vector2{ mapToReal(GetMousePosition().x, minR, maxR), mapToImaginary(GetMousePosition().y, minI, maxI)};
+    //map mouse coordinate to mandelbrot point
+    float minR = ((-0.5 * getWidth() / getHeight()) * zoom) - location[0];
+    float maxR = ((0.5 * getWidth() / getHeight()) * zoom) - location[0];
+    float minI = -0.5 * zoom + location[1];
+    float maxI = 0.5 * zoom + location[1];
+    mousePos = Vector2{ mapToReal(GetMousePosition().x, minR, maxR), mapToImaginary(GetMousePosition().y, minI, maxI)};
+
+    //stability visualiser mode
+    if (stabilityVisualiser) {
+        Vector2 z = { 0, 0 };
+        for (int i = 0; i < 50; i++) {
+
+            //start at zero, do appropriate set formula and add mousepos;
+            if (activeFractal == &mandelbrot) {
+                float temp = z.x;
+                z.x = z.x * z.x - z.y * z.y;
+                z.y = 2.0 * temp * z.y;
+                z = Vector2Add(z, mousePos);
+            }
+            else if (activeFractal == &tricorn) {
+                z = { z.x, -z.y };
+                float temp = z.x;
+                z.x = z.x * z.x - z.y * z.y;
+                z.y = 2.0 * temp * z.y;
+                z = Vector2Add(z, mousePos);
+
+            }
+            else if (activeFractal == &burningShip) {
+                float temp = abs(z.x);
+                z.x = abs(z.x * z.x) - abs(z.y * z.y);
+                z.y = 2.0 * temp * abs(z.y);
+                z = Vector2Add(z, mousePos);
+            }
+         
+            //convert back to screenspace and draw a circle at each point with connected lines;
+            int x = ((z.x + location[0]) * (getWidth() / (maxR - minR))) + getWidth() / 2;
+            int y = ((z.y - location[1]) * (getHeight() / (maxI - minI))) + getHeight() / 2;
+
+            DrawCircle(x, y, 5, RED);
+        }
     }
 
     SetShaderValue(*activeFractal, mousePosLoc, &mousePos, SHADER_UNIFORM_VEC2);
@@ -105,9 +140,6 @@ void FractalVisualiser::draw()
 	
 void FractalVisualiser::keyEvents()
 {
-    if (IsKeyPressed(KEY_J)) {
-        juliaMode = !juliaMode;
-    }
     if (IsKeyPressed(KEY_S)) {
         //string stream for name
         std::stringstream stream;
@@ -129,9 +161,6 @@ void FractalVisualiser::keyEvents()
         location[0] = 0;
         location[1] = 0;
         zoom = 2.0f;
-    }
-    if (IsKeyPressed(KEY_ENTER) && juliaMode) {
-        juliaFrozen = !juliaFrozen; //pause or resume julia set
     }
     if (IsKeyDown(KEY_DOWN)) {
         location[1] += 0.01 * zoom;
@@ -189,7 +218,7 @@ void FractalVisualiser::setFractal(Shader& fractal)
     resolutionLoc = GetShaderLocation(fractal, "resolution");
     locationLoc = GetShaderLocation(fractal, "location");
     mousePosLoc = GetShaderLocation(fractal, "mousePos");
-    juliaModeLoc = GetShaderLocation(fractal, "juliaMode");   
+    juliaModeLoc = GetShaderLocation(fractal, "juliaMode"); 
 }
 
 FractalVisualiser::~FractalVisualiser()

@@ -38,7 +38,8 @@ private:
 
     Vector2 mousePos = {0,0};
     bool juliaMode = false;
-    bool juliaFrozen = false;
+    bool stabilityVisualiser = false;
+
     float zoom = 2.0f;
 
     int selectedFractal = 0;
@@ -62,6 +63,5 @@ private:
     void setFractal(Shader& shader);
     float mapToReal(float x, float minR, float maxR);
     float mapToImaginary(float x, float minI, float maxI);
-
 };
 

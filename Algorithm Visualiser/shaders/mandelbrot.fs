@@ -3,7 +3,7 @@
 uniform vec2 resolution;
 uniform vec2 location;
 uniform vec2 mousePos;
-uniform bool juliaMode;
+uniform int juliaMode;
 uniform float zoom;
 uniform float color_1;
 uniform float color_2;
@@ -28,7 +28,7 @@ vec3 hsv2rgb(vec3 hue){
 vec3 mandelbrot(vec2 point){
     vec2 z;
 
-    if (juliaMode){ //z is point - julia set
+    if (juliaMode == 1){ //z is point - julia set
       z = point;
       point = mousePos;
 
@@ -57,7 +57,7 @@ void main()
     uv.x *= resolution.x / resolution.y;
     uv -= vec2((resolution.x/resolution.y)/2, 0.5); //move center of mandelbrot to center
 
-    if (juliaMode){
+    if (juliaMode == 1){
         uv *= 2.5;
     }
     else{

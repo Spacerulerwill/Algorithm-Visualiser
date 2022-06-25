@@ -3,7 +3,7 @@
 uniform vec2 resolution;
 uniform vec2 location;
 uniform vec2 mousePos;
-uniform bool juliaMode;
+uniform int juliaMode;
 uniform float zoom;
 uniform float color_1;
 uniform float color_2;
@@ -38,7 +38,7 @@ float mapToImaginary(float y, float minI, float maxI){
 
 vec3 tricorn(vec2 point){
     vec2 z;
-    if (juliaMode){ //z is point - julia set
+    if (juliaMode == 1){ //z is point - julia set
         z = point;
         point = mousePos;
     }else{ //z starts at 0 and is squared, with point added on - mandelbrot set
@@ -61,7 +61,7 @@ void main()
     uv.x *= resolution.x / resolution.y;
     uv -= vec2((resolution.x/resolution.y)/2, 0.5);
 
-    if (juliaMode){
+    if (juliaMode == 1){
         uv *= 2.5;
     }
     else{
