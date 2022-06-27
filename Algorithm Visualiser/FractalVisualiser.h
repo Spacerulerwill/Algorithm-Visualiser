@@ -40,6 +40,7 @@ private:
     Vector2 mousePos = {0,0};
     bool juliaMode = false;
     bool stabilityVisualiser = false;
+    bool juliaFrozen = false;
 
     int selectedFractal = 0;
     const char* fractals[3] = { "Mandelbrot", "Burning Ship", "Tricorn"};

@@ -302,12 +302,14 @@ void SortingVisualiser::keyEvents() {
 			std::shuffle(std::begin(arr), std::end(arr), std::default_random_engine());
 	}
 
+	//execute sort
 	if (runButton) {
 		if (state == State::IDLE) {
 			startSortThread();
 		}
 	}
 
+	//change style
 	if (styleButton) {
 		int currentStyle = static_cast<int>(style);
 		if (currentStyle == 2)
@@ -323,13 +325,13 @@ void SortingVisualiser::keyEvents() {
 			arr.push_back(rand() % maxValue + 1);
 	}
 
+	//changing sort
 	if (algorithmSelector) {
 		setSort((Sorts)algorithmIndex);
 	}
 }
 
 // SORTING ALGORITHMS
-
 void SortingVisualiser::bubbleSort(std::vector<int>& arr)
 {
 	//index accessing array filled with max amount accessed at any given time

@@ -53,7 +53,7 @@ void FractalVisualiser::draw()
         stream << "+/= Zoom\nArrow keys - Pan\n";
         stream << zoom << "x zoom\n";
         stream << -location[0] << " + " << -location[1] << "i\n";
-        stream << "R - reset\n";
+        stream << "R - reset\nJ - Julia Set\n";
     }
 
     std::string s = stream.str();
@@ -73,9 +73,13 @@ void FractalVisualiser::draw()
 
     colorSelector = ImGui::Combo("Color Preset", &selectedColorPreset, colorPresetNames, 4);
 
-    ImGui::Checkbox("Julia Set", &juliaMode);
+    if (ImGui::Checkbox("Julia Set", &juliaMode)) {
+        stabilityVisualiser = false;
+    }
 
-    ImGui::Checkbox("Stabiliy Visualiser", &stabilityVisualiser);
+    if (ImGui::Checkbox("Stabiliy Visualiser", &stabilityVisualiser)) {
+        juliaMode = false;
+    }
 
     //std::cout << juliaMode << " " << stabilityVisualiser << "\n";
 
@@ -98,7 +102,11 @@ void FractalVisualiser::draw()
     float maxR = ((0.5 * getWidth() / getHeight()) * zoom) - location[0];
     float minI = -0.5 * zoom + location[1];
     float maxI = 0.5 * zoom + location[1];
-    mousePos = Vector2{ mapToReal(GetMousePosition().x, minR, maxR), mapToImaginary(GetMousePosition().y, minI, maxI)};
+
+    mousePos = Vector2{ mapToReal(GetMousePosition().x, minR, maxR), mapToImaginary(GetMousePosition().y, minI, maxI) };
+    
+
+    SetShaderValue(*activeFractal, mousePosLoc, &mousePos, SHADER_UNIFORM_VEC2);
 
     //stability visualiser mode
     if (stabilityVisualiser) {
@@ -136,7 +144,6 @@ void FractalVisualiser::draw()
     }
 
     //set mousepos shader value
-    SetShaderValue(*activeFractal, mousePosLoc, &mousePos, SHADER_UNIFORM_VEC2);
 }
 	
 void FractalVisualiser::keyEvents()
@@ -165,6 +172,12 @@ void FractalVisualiser::keyEvents()
         location[0] = 0;
         location[1] = 0;
         zoom = 2.0f;
+    }
+    if (IsKeyPressed(KEY_J)) {
+        juliaMode = !juliaMode;
+    }
+    if (IsKeyPressed(KEY_ENTER) && juliaMode) {
+        std::cout << "bruh";
     }
     //panning controls
     if (IsKeyDown(KEY_DOWN)) {
