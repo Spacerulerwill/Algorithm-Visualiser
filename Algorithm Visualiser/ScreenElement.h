@@ -18,5 +18,6 @@ public:
 	float getY() { return GetScreenHeight() * yRatio; }
 	virtual void draw() {}
 	virtual void keyEvents() {}
-	virtual void update() { draw(); keyEvents(); }
+	virtual void events() {}
+	virtual void update() { draw(); keyEvents(); events(); }
 };

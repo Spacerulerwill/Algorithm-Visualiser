@@ -3,9 +3,9 @@
 #include "raylib.h"
 
 int main() {
-	//create singleton
+	// create singleton
 	Program* program = Program::getInstance();
 
-	// program successfully executed
+	// program successful
 	return 0;
 }

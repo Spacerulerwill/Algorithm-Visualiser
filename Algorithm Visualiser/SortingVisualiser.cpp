@@ -255,6 +255,7 @@ void SortingVisualiser::drawBars()
 	}
 	case Style::CIRCLE:
 	{
+		// draw multicolored circle
 		Vector2 center = { getX() + getWidth() / 2.0f , getY() + getHeight() / 2.0f };
 		float radius = getWidth() / 4.0f;
 			
@@ -301,7 +302,9 @@ void SortingVisualiser::keyEvents() {
 		if (IsKeyPressed(KEY_SPACE) || randomButton)
 			std::shuffle(std::begin(arr), std::end(arr), std::default_random_engine());
 	}
+}
 
+void SortingVisualiser::events() {
 	//execute sort
 	if (runButton) {
 		if (state == State::IDLE) {
@@ -330,7 +333,6 @@ void SortingVisualiser::keyEvents() {
 		setSort((Sorts)algorithmIndex);
 	}
 }
-
 // SORTING ALGORITHMS
 void SortingVisualiser::bubbleSort(std::vector<int>& arr)
 {

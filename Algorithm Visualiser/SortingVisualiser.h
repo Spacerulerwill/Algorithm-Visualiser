@@ -10,14 +10,13 @@ public:
 	//constructor
 	SortingVisualiser(float xRatio, float yRatio, float widthRatio, float heightRatio);
 
-	//override draw method
-	void draw() override;
-	void keyEvents() override;
-
+private:
 	//start sort thread
 	void startSortThread();
 
-private:
+	void draw() override;
+	void keyEvents() override;
+	void events() override;
 
 	//state enum class
 	enum class State { SORTING, CHECKING, IDLE };

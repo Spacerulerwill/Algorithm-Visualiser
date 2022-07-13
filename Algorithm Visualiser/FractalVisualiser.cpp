@@ -26,13 +26,15 @@ FractalVisualiser::FractalVisualiser(float xRatio, float yRatio, float widthRati
     setFractal(mandelbrot);
 }   
 
-float FractalVisualiser::mapToReal(float x, float minR, float maxR) {
-    float range = maxR - minR;
+template<typename T>
+T FractalVisualiser::mapToReal(int x, T minR, T maxR) {
+    T range = maxR - minR;
     return x * (range / getWidth()) + minR;
 }
 
-float FractalVisualiser::mapToImaginary(float y, float minI, float maxI) {
-    float range = maxI - minI;
+template<typename T>
+T FractalVisualiser::mapToImaginary(int y, T minI, T maxI) {
+    T range = maxI - minI;
     return y * (range / getHeight()) + minI;
 }
 
@@ -55,6 +57,7 @@ void FractalVisualiser::draw() {
     ImGui::SliderFloat("Color 4", &color_4, 0.0f, 1.0f, "% .3f");
 
     colorSelector = ImGui::Combo("Color Preset", &selectedColorPreset, colorPresetNames, numColors);
+    saveImageButton = ImGui::Button("Save Image");
 
     if (!highPrecisionMode) {
         if (ImGui::Checkbox("Julia Set", &juliaMode)) {
@@ -115,7 +118,6 @@ void FractalVisualiser::renderRealTimeFractal()
 
     if (juliaMode) {
         stream << mousePos.x << "  + " << -mousePos.y << "i\n";
-        stream << "S - save image\n";
         if (juliaFrozen) {
             stream << "F - unfreeze Julia Set";
         }
@@ -124,10 +126,10 @@ void FractalVisualiser::renderRealTimeFractal()
         }
     }
     else {
-        stream << location[0] << " + " << location[1] << "i\n";
+        stream << location.x << " + " << location.y << "i\n";
         stream << "+/= Zoom\nArrow keys - Pan\n";
         stream << zoom << "x zoom\n";
-        stream << "S - save image\nR - reset\nJ - Julia Set\n";
+        stream << "R - reset\nJ - Julia Set\n";
     }
 
     std::string s = stream.str();
@@ -141,10 +143,10 @@ void FractalVisualiser::renderRealTimeFractal()
     SetShaderValue(*activeFractal, resolutionLoc, &resolution, SHADER_UNIFORM_VEC2);
 
     //map mouse coordinate to imaginary point
-    float minR = ((-0.5 * getWidth() / getHeight()) * zoom) + location[0];
-    float maxR = ((0.5 * getWidth() / getHeight()) * zoom) + location[0];
-    float minI = -0.5 * zoom - location[1];
-    float maxI = 0.5 * zoom - location[1];
+    float minR = ((-0.5 * getWidth() / getHeight()) * zoom) + location.x;
+    float maxR = ((0.5 * getWidth() / getHeight()) * zoom) + location.x;
+    float minI = -0.5 * zoom - location.y;
+    float maxI = 0.5 * zoom - location.y;
 
     //set shader values
     if (!juliaFrozen || (juliaFrozen && stabilityVisualiser)) {
@@ -178,13 +180,14 @@ void FractalVisualiser::renderRealTimeFractal()
             }
          
             //convert back to screen space coordinates
-            int x = 0;
-            int y = 0;
+            int x = z.x / ((maxR - minR) / getWidth()) - minR + getWidth() / 2;;
+            int y = z.y / ((maxI - minI) / getHeight()) - minI + getHeight() / 2;
 
             DrawCircle(x, y, 5, RED);
         }
     }
 }
+
 
 Vector2 FractalVisualiser::mandelbrotFormula(Vector2 z, Vector2 c)
 {
@@ -192,6 +195,15 @@ Vector2 FractalVisualiser::mandelbrotFormula(Vector2 z, Vector2 c)
     z.x = z.x * z.x - z.y * z.y;
     z.y = 2.0 * temp * z.y;
     z = Vector2Add(z, c);
+    return z;
+}
+
+FractalVisualiser::DVector2 FractalVisualiser::preciseMandelbrotFormula(DVector2 z, DVector2 c)
+{
+    double temp = z.x;
+    z.x = z.x * z.x - z.y * z.y;
+    z.y = 2.0 * temp * z.y;
+    z = DVector2Add(z, c);
     return z;
 }
 
@@ -217,20 +229,22 @@ Vector2 FractalVisualiser::tricornFormula(Vector2 z, Vector2 c)
 // high precision mode (runs with arbitrary precision floats)
 void FractalVisualiser::drawCalculatedFractalToImage()
 {
+    
     // convert coordinate to string to coordinates and invert the signs
-    float real = std::stof(realCoordinate);
-    float imag = std::stof(imaginaryCoordinate);
+    double real = std::stod(realCoordinate);
+    double imag = std::stod(imaginaryCoordinate);
 
-    // convert zoom to coordinate
-    float zoom = std::stof(zoomInput);
+    //convert zoom
+    double zoom = std::stod(zoomInput);
 
     isLoadingHighPrecisionFractal = true;
     highPrecisionImage = GenImageColor((int)getWidth(), (int)getHeight(), BLANK);
-    //map mouse coordinate to imaginary point
-    float minR = ((-0.5 * getWidth() / getHeight()) * zoom) + real;
-    float maxR = ((0.5 * getWidth() / getHeight()) * zoom) + real;
-    float minI = -0.5 * zoom - imag;
-    float maxI = 0.5 * zoom - imag;
+
+    // map to complex point
+    double minR = ((-0.5 * getWidth() / getHeight()) * zoom) + real;
+    double maxR = ((0.5 * getWidth() / getHeight()) * zoom) + real;
+    double minI = -0.5 * zoom - imag;
+    double maxI = 0.5 * zoom - imag;
 
     int totalPixels = getWidth() * getHeight();
     int column = getHeight();
@@ -238,34 +252,27 @@ void FractalVisualiser::drawCalculatedFractalToImage()
 
     for (int x = 0; x < getWidth(); x++) {
         for (int y = 0; y < getHeight(); y++) {
-            Vector2 c = { mapToReal(x, minR, maxR), mapToImaginary(y, minI, maxI) };
-            Vector2 z = { 0.0f, 0.0f };
+            DVector2 c = { mapToReal(x, minR, maxR), mapToImaginary(y, minI, maxI) };
+            DVector2 z = { 0.0, 0.0 };
 
             int i;
-            for (i = 0; i < iterations; i++) {        
+            for (i = 0; i < iterations; i++) {
                 if (activeFractal == &mandelbrot) {
                     //square
-                    z = mandelbrotFormula(z, c);
+                    z = preciseMandelbrotFormula(z, c);
                 }
-                else if (activeFractal == &burningShip) {
-                    z = burningshipFormula(z, c);
-                }
-                else if (activeFractal == &tricorn) {
-                    z = tricornFormula(z, c);
-                }
-
-                if (Vector2DotProduct(z, z) > 4.0) {
+                if (DVector2DotProduct(z, z) > 4.0) {
                     break;
                 }
             }
             //convert RGB to HSV
-            Color color = ColorFromHSV((i / float(iterations))*360, 1.0, 1.0);
+            Color color = ColorFromHSV((i / float(iterations)) * 360, 1.0, 1.0);
             ImageDrawPixel(&highPrecisionImage, x, y, color);
             int total = x * column + y;
 
             //percentage
             if (total % onePercent == 0) {
-                percentLoaded = (total/(float)totalPixels) * 100;
+                percentLoaded = (total / (float)totalPixels) * 100;
             }
         }
     }
@@ -276,30 +283,11 @@ void FractalVisualiser::drawCalculatedFractalToImage()
 	
 void FractalVisualiser::keyEvents()
 {
-    //save fractal image
-    if (IsKeyPressed(KEY_S)) {
-        //string stream for name
-        std::stringstream stream;
-        if (juliaMode) {
-            stream << fractals[selectedFractal] << " Julia Set at " << mousePos.x << " + " << -mousePos.y << "i.png";
-        }
-        else {
-            stream << fractals[selectedFractal] << " at " << location[0] << " + " << location[1] << "i.png";
-        }
-
-        std::string s = stream.str();
-        const char* name = s.c_str();
-
-        //save
-        Image image = LoadImageFromScreen();
-        ExportImage(image, name);
-        UnloadImage(image);
-    }
     if (!highPrecisionMode) {
         if (IsKeyPressed(KEY_R)) {
             //change zoom to default and move back to center
-            location[0] = 0;
-            location[1] = 0;
+            location.x = 0;
+            location.y = 0;
             zoom = 2.0f;
         }
         if (IsKeyPressed(KEY_J)) {
@@ -309,16 +297,16 @@ void FractalVisualiser::keyEvents()
             juliaFrozen = !juliaFrozen;
         }
         if (IsKeyDown(KEY_DOWN)) {
-            location[1] -= 0.01 * zoom;
+            location.y -= 0.01 * zoom;
         }
         if (IsKeyDown(KEY_UP)) {
-            location[1] += 0.01 * zoom;
+            location.y += 0.01 * zoom;
         }
         if (IsKeyDown(KEY_LEFT)) {
-            location[0] -= 0.01 * zoom;
+            location.x -= 0.01 * zoom;
         }
         if (IsKeyDown(KEY_RIGHT)) {
-            location[0] += 0.01 * zoom;
+            location.x += 0.01 * zoom;
         }
         //zooming in
         if (IsKeyDown(KEY_EQUAL) && zoom >= 0) {
@@ -328,7 +316,10 @@ void FractalVisualiser::keyEvents()
             zoom += 0.01 * zoom;
         }
     }
+}
 
+void FractalVisualiser::events()
+{
     //selecting fractal from menu
     if (fractalSelector) {
         switch (selectedFractal) {
@@ -359,6 +350,25 @@ void FractalVisualiser::keyEvents()
     if (shouldLoadHighPrecisionTexture) {
         highPrecisionTexture = LoadTextureFromImage(highPrecisionImage);
         shouldLoadHighPrecisionTexture = false;
+    }
+
+    if (saveImageButton) {
+        //string stream for name
+        std::stringstream stream;
+        if (juliaMode) {
+            stream << fractals[selectedFractal] << " Julia Set at " << mousePos.x << " + " << -mousePos.y << "i.png";
+        }
+        else {
+            stream << fractals[selectedFractal] << " at " << location.x << " + " << location.y << "i.png";
+        }
+
+        std::string s = stream.str();
+        const char* name = s.c_str();
+
+        //save
+        Image image = LoadImageFromScreen();
+        ExportImage(image, name);
+        UnloadImage(image);
     }
 }
 
