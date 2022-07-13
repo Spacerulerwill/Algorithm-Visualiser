@@ -1,5 +1,6 @@
 #pragma once
 #include "ScreenElement.h"
+#include <string>
 
 class FractalVisualiser :
 
@@ -76,6 +77,14 @@ private:
     int percentLoaded = 0;
     bool shouldLoadHighPrecisionTexture = false;
     bool isLoadingHighPrecisionFractal = false;
+
+    bool realInputBox;
+    bool imaginaryInputBox;
+    bool zoomInputBox;
+    bool renderButton;
+    std::string realCoordinate = "0";
+    std::string imaginaryCoordinate = "0";
+    std::string zoomInput = "2.0";
 
     // fractal functions
     void setFractal(Shader& shader);

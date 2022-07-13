@@ -2,11 +2,13 @@
 #include "imgui.h"
 #include "imgui_impl_raylib.h"
 #include "imgui_internal.h"
+#include "imgui_stdlib.h"
 #include "rlImGui.h"
 #include "raymath.h"
 #include <sstream>
 #include <thread>
 #include <iostream>
+#include <string>
 #include <functional>
 
 #define GLSL_VERSION 450
@@ -40,7 +42,13 @@ void FractalVisualiser::draw() {
     fractalSelector = ImGui::Combo("Fractal", &selectedFractal, fractals, numFractals);
     ImGui::SliderInt("Iterations", &iterations, 0, 1000, "% .3f");
 
-    //float conversion for slider bar
+    if (highPrecisionMode) {
+        realInputBox = ImGui::InputText("Real Number", &realCoordinate);
+        imaginaryInputBox = ImGui::InputText("Imaginary Number", &imaginaryCoordinate);
+        zoomInputBox = ImGui::InputText("Zoom", &zoomInput);
+    }
+
+    //floats for colors
     ImGui::SliderFloat("Color 1", &color_1, 0.0f, 1.0f, "% .3f");
     ImGui::SliderFloat("Color 2", &color_2, 0.0f, 1.0f, "% .3f");
     ImGui::SliderFloat("Color 3", &color_3, 0.0f, 1.0f, "% .3f");
@@ -59,12 +67,15 @@ void FractalVisualiser::draw() {
     }
     else {
         ImGui::PushItemFlag(ImGuiItemFlags_Disabled, isLoadingHighPrecisionFractal); // disable controls if sorting
-        if (ImGui::Button("Render Image")) {
+        renderButton = ImGui::Button("Render Image");
+        ImGui::PopItemFlag();
+
+        if (renderButton) {
             std::thread th(&FractalVisualiser::drawCalculatedFractalToImage, this);
             th.detach();
         }
-        ImGui::PopItemFlag();
-    }
+     }    
+
     if (ImGui::Checkbox("High Precision Mode (Non Real-Time)", &highPrecisionMode)) {
         juliaMode = false;
         stabilityVisualiser = false;
@@ -106,14 +117,14 @@ void FractalVisualiser::renderRealTimeFractal()
         stream << mousePos.x << "  + " << -mousePos.y << "i\n";
         stream << "S - save image\n";
         if (juliaFrozen) {
-            stream << "Enter - unfreeze Julia Set";
+            stream << "F - unfreeze Julia Set";
         }
         else {
-            stream << "Enter - freeze Julia Set";
+            stream << "F - freeze Julia Set";
         }
     }
     else {
-        stream << -location[0] << " + " << -location[1] << "i\n";
+        stream << location[0] << " + " << location[1] << "i\n";
         stream << "+/= Zoom\nArrow keys - Pan\n";
         stream << zoom << "x zoom\n";
         stream << "S - save image\nR - reset\nJ - Julia Set\n";
@@ -126,13 +137,14 @@ void FractalVisualiser::renderRealTimeFractal()
     //update shader values
     resolution[0] = getWidth();
     resolution[1] = getHeight();
+
     SetShaderValue(*activeFractal, resolutionLoc, &resolution, SHADER_UNIFORM_VEC2);
 
     //map mouse coordinate to imaginary point
-    float minR = ((-0.5 * getWidth() / getHeight()) * zoom) - location[0];
-    float maxR = ((0.5 * getWidth() / getHeight()) * zoom) - location[0];
-    float minI = -0.5 * zoom + location[1];
-    float maxI = 0.5 * zoom + location[1];
+    float minR = ((-0.5 * getWidth() / getHeight()) * zoom) + location[0];
+    float maxR = ((0.5 * getWidth() / getHeight()) * zoom) + location[0];
+    float minI = -0.5 * zoom - location[1];
+    float maxI = 0.5 * zoom - location[1];
 
     //set shader values
     if (!juliaFrozen || (juliaFrozen && stabilityVisualiser)) {
@@ -165,9 +177,9 @@ void FractalVisualiser::renderRealTimeFractal()
                 z = burningshipFormula(z, mousePos);
             }
          
-            //convert back to screenspace and draw a circle at each point with connected lines;
-            int x = ((z.x + location[0]) * (getWidth() / (maxR - minR))) + getWidth() / 2;
-            int y = ((z.y - location[1]) * (getHeight() / (maxI - minI))) + getHeight() / 2;
+            //convert back to screen space coordinates
+            int x = 0;
+            int y = 0;
 
             DrawCircle(x, y, 5, RED);
         }
@@ -205,13 +217,20 @@ Vector2 FractalVisualiser::tricornFormula(Vector2 z, Vector2 c)
 // high precision mode (runs with arbitrary precision floats)
 void FractalVisualiser::drawCalculatedFractalToImage()
 {
+    // convert coordinate to string to coordinates and invert the signs
+    float real = std::stof(realCoordinate);
+    float imag = std::stof(imaginaryCoordinate);
+
+    // convert zoom to coordinate
+    float zoom = std::stof(zoomInput);
+
     isLoadingHighPrecisionFractal = true;
     highPrecisionImage = GenImageColor((int)getWidth(), (int)getHeight(), BLANK);
     //map mouse coordinate to imaginary point
-    float minR = ((-0.5 * getWidth() / getHeight()) * zoom) - location[0];
-    float maxR = ((0.5 * getWidth() / getHeight()) * zoom) - location[0];
-    float minI = -0.5 * zoom + location[1];
-    float maxI = 0.5 * zoom + location[1];
+    float minR = ((-0.5 * getWidth() / getHeight()) * zoom) + real;
+    float maxR = ((0.5 * getWidth() / getHeight()) * zoom) + real;
+    float minI = -0.5 * zoom - imag;
+    float maxI = 0.5 * zoom - imag;
 
     int totalPixels = getWidth() * getHeight();
     int column = getHeight();
@@ -265,7 +284,7 @@ void FractalVisualiser::keyEvents()
             stream << fractals[selectedFractal] << " Julia Set at " << mousePos.x << " + " << -mousePos.y << "i.png";
         }
         else {
-            stream << fractals[selectedFractal] << " at " << -location[0] << " + " << -location[1] << "i.png";
+            stream << fractals[selectedFractal] << " at " << location[0] << " + " << location[1] << "i.png";
         }
 
         std::string s = stream.str();
@@ -286,20 +305,20 @@ void FractalVisualiser::keyEvents()
         if (IsKeyPressed(KEY_J)) {
             juliaMode = !juliaMode;
         }
-        if (IsKeyPressed(KEY_ENTER)) {
+        if (IsKeyPressed(KEY_F)) {
             juliaFrozen = !juliaFrozen;
         }
         if (IsKeyDown(KEY_DOWN)) {
-            location[1] += 0.01 * zoom;
-        }
-        if (IsKeyDown(KEY_UP)) {
             location[1] -= 0.01 * zoom;
         }
+        if (IsKeyDown(KEY_UP)) {
+            location[1] += 0.01 * zoom;
+        }
         if (IsKeyDown(KEY_LEFT)) {
-            location[0] += 0.01 * zoom;
+            location[0] -= 0.01 * zoom;
         }
         if (IsKeyDown(KEY_RIGHT)) {
-            location[0] -= 0.01 * zoom;
+            location[0] += 0.01 * zoom;
         }
         //zooming in
         if (IsKeyDown(KEY_EQUAL) && zoom >= 0) {

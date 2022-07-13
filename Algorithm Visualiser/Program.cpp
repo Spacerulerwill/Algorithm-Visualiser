@@ -53,7 +53,6 @@ Program::Program()
 			}
 		}
 
-
 		drawAlgorithmSelector(); // draw algorithm selector ImGui widget
 		activeVisualiser->update(); // update active visualiser
 
