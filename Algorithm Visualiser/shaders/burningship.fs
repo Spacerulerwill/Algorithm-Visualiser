@@ -60,13 +60,10 @@ void main()
     vec2 uv = gl_FragCoord.xy / resolution;
     uv.x *= resolution.x / resolution.y;
     uv -= vec2((resolution.x/resolution.y)/2, 0.5);
-    if (juliaMode == 1){
-        uv *= 2.5;
-    }
-    else{
-        uv *= zoom; //zoom
-        uv -= location;
-    }
+   
+    uv *= zoom; //zoom
+    uv -= location;
+    
     uv.y *= -1;
     gl_FragColor = vec4(burningship(uv), 1.0);
 }
