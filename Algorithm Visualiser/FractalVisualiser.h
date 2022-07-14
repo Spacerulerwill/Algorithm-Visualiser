@@ -71,6 +71,18 @@ private:
 
     Texture2D realTimeTexture; //real time texture
 
+    //buttons and stuff
+    bool realInputBox;
+    bool imaginaryInputBox;
+    bool zoomInputBox;
+    bool renderButton;
+    bool saveImageButton;
+    bool mouseOrbit;
+
+    //orbit controls
+    float orbitRadius = 0.05f;
+    float orbitSpeed = 1.0f;
+
     //high precision fractal settings
     Image highPrecisionImage;
     Texture2D highPrecisionTexture;
@@ -78,11 +90,6 @@ private:
     bool shouldLoadHighPrecisionTexture = false;
     bool isLoadingHighPrecisionFractal = false;
 
-    bool realInputBox;
-    bool imaginaryInputBox;
-    bool zoomInputBox;
-    bool renderButton;
-    bool saveImageButton;
     std::string realCoordinate = "0";
     std::string imaginaryCoordinate = "0";
     std::string zoomInput = "2.0";

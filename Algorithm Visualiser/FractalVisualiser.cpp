@@ -67,6 +67,14 @@ void FractalVisualiser::draw() {
         if (ImGui::Checkbox("Stabiliy Visualiser", &stabilityVisualiser)) {
             juliaMode = false;
         }
+
+        if (juliaMode) {
+            ImGui::Checkbox("Mouse Orbit", &mouseOrbit);
+            if (mouseOrbit) {
+                ImGui::SliderFloat("Orbital Radius", &orbitRadius, 0.05f, 1.0f);
+                ImGui::SliderFloat("Orbit Speed", &orbitSpeed, 1.0f, 10.0f);
+            }
+        }
     }
     else {
         ImGui::PushItemFlag(ImGuiItemFlags_Disabled, isLoadingHighPrecisionFractal); // disable controls if sorting
@@ -112,7 +120,7 @@ void FractalVisualiser::renderRealTimeFractal()
     EndShaderMode();
     
     //Draw Text
-    float font = (GetScreenWidth()) / 50;
+    float font = (GetScreenWidth()) / 50.0f;
     std::stringstream stream;
     stream << "Focused on point: ";
 
@@ -148,21 +156,18 @@ void FractalVisualiser::renderRealTimeFractal()
     float minI = -0.5 * zoom - location.y;
     float maxI = 0.5 * zoom - location.y;
 
-    //set shader values
+    //set mousePos
     if (!juliaFrozen || (juliaFrozen && stabilityVisualiser)) {
         //set mousepos shader value
         mousePos = Vector2{ mapToReal(GetMousePosition().x, minR, maxR), mapToImaginary(GetMousePosition().y, minI, maxI) };
+        SetShaderValue(*activeFractal, mousePosLoc, &mousePos, SHADER_UNIFORM_VEC2);
     }
-
-    SetShaderValue(*activeFractal, mousePosLoc, &mousePos, SHADER_UNIFORM_VEC2);
-    SetShaderValue(*activeFractal, juliaModeLoc, &juliaMode, SHADER_UNIFORM_INT); 
-    SetShaderValue(*activeFractal, locationLoc, &location, SHADER_UNIFORM_VEC2);
-    SetShaderValue(*activeFractal, zoomLoc, &zoom, SHADER_UNIFORM_FLOAT); 
-    SetShaderValue(*activeFractal, color_1Loc, &color_1, SHADER_UNIFORM_FLOAT);
-    SetShaderValue(*activeFractal, color_2Loc, &color_2, SHADER_UNIFORM_FLOAT);
-    SetShaderValue(*activeFractal, color_3Loc, &color_3, SHADER_UNIFORM_FLOAT);
-    SetShaderValue(*activeFractal, color_4Loc, &color_4, SHADER_UNIFORM_FLOAT);
-    SetShaderValue(*activeFractal, iterationsLoc, &iterations, SHADER_UNIFORM_INT);
+    if (mouseOrbit && juliaMode) {
+        Vector2 newMousePos = mousePos;
+        newMousePos.x += sin(orbitSpeed * GetTime()) * orbitRadius;
+        newMousePos.y += cos(orbitSpeed * GetTime()) * orbitRadius;
+        SetShaderValue(*activeFractal, mousePosLoc, &newMousePos, SHADER_UNIFORM_VEC2);
+    }
 
     //stability visualiser mode
     if (stabilityVisualiser) {
@@ -178,7 +183,7 @@ void FractalVisualiser::renderRealTimeFractal()
             else if (activeFractal == &burningShip) {
                 z = burningshipFormula(z, mousePos);
             }
-         
+
             //convert back to screen space coordinates
             int x = z.x / ((maxR - minR) / getWidth()) - minR + getWidth() / 2;;
             int y = z.y / ((maxI - minI) / getHeight()) - minI + getHeight() / 2;
@@ -186,6 +191,15 @@ void FractalVisualiser::renderRealTimeFractal()
             DrawCircle(x, y, 5, RED);
         }
     }
+  
+    SetShaderValue(*activeFractal, juliaModeLoc, &juliaMode, SHADER_UNIFORM_INT); 
+    SetShaderValue(*activeFractal, locationLoc, &location, SHADER_UNIFORM_VEC2);
+    SetShaderValue(*activeFractal, zoomLoc, &zoom, SHADER_UNIFORM_FLOAT); 
+    SetShaderValue(*activeFractal, color_1Loc, &color_1, SHADER_UNIFORM_FLOAT);
+    SetShaderValue(*activeFractal, color_2Loc, &color_2, SHADER_UNIFORM_FLOAT);
+    SetShaderValue(*activeFractal, color_3Loc, &color_3, SHADER_UNIFORM_FLOAT);
+    SetShaderValue(*activeFractal, color_4Loc, &color_4, SHADER_UNIFORM_FLOAT);
+    SetShaderValue(*activeFractal, iterationsLoc, &iterations, SHADER_UNIFORM_INT);
 }
 
 
@@ -282,7 +296,7 @@ void FractalVisualiser::drawCalculatedFractalToImage()
 }
 	
 void FractalVisualiser::keyEvents()
-{
+{ 
     if (!highPrecisionMode) {
         if (IsKeyPressed(KEY_R)) {
             //change zoom to default and move back to center
