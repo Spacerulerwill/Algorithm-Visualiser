@@ -67,7 +67,6 @@ Program::Program()
 
 	delete sortVisualiser;
 	delete fractalVisualiser;
-
 }
 
 void Program::drawAlgorithmSelector()

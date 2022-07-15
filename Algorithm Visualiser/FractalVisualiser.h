@@ -115,7 +115,6 @@ private:
     void drawCalculatedFractalToImage();
     void drawFractalLoadPercentage();
 
-
     Vector2 mandelbrotFormula(Vector2 z, Vector2 c);
     DVector2 preciseMandelbrotFormula(DVector2 z, DVector2 c);
     Vector2 burningshipFormula(Vector2 z, Vector2 c);

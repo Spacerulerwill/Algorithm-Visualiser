@@ -9,7 +9,6 @@
 #include <thread>
 #include <iostream>
 #include <string>
-#include <functional>
 
 #define GLSL_VERSION 450
 
@@ -202,7 +201,6 @@ void FractalVisualiser::renderRealTimeFractal()
     SetShaderValue(*activeFractal, iterationsLoc, &iterations, SHADER_UNIFORM_INT);
 }
 
-
 Vector2 FractalVisualiser::mandelbrotFormula(Vector2 z, Vector2 c)
 {
     float temp = z.x;
@@ -381,8 +379,9 @@ void FractalVisualiser::events()
 
         //save
         Image image = LoadImageFromScreen();
-        ExportImage(image, name);
-        UnloadImage(image);
+        std::cout << "Exported\n";
+        //ExportImage(image, name);
+        //UnloadImage(image);
     }
 }
 
