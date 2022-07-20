@@ -9,6 +9,7 @@
 #include <thread>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #define GLSL_VERSION 450
 
@@ -38,11 +39,11 @@ T FractalVisualiser::mapToImaginary(int y, T minI, T maxI) {
 }
 
 void FractalVisualiser::draw() {
-
     ImGui::Begin("Fractal Settings", NULL, ImGuiWindowFlags_None);
     fractalSelector = ImGui::Combo("Fractal", &selectedFractal, fractals, numFractals);
     ImGui::SliderInt("Iterations", &iterations, 0, 1000, "% .3f");
 
+    // input boxes for high precision mode
     if (highPrecisionMode) {
         realInputBox = ImGui::InputText("Real Number", &realCoordinate);
         imaginaryInputBox = ImGui::InputText("Imaginary Number", &imaginaryCoordinate);
@@ -58,7 +59,16 @@ void FractalVisualiser::draw() {
     colorSelector = ImGui::Combo("Color Preset", &selectedColorPreset, colorPresetNames, numColors);
     saveImageButton = ImGui::Button("Save Image");
 
+    if (juliaMode && mouseOrbit) {
+        ImGui::SameLine();
+        ImGui::PushItemFlag(ImGuiItemFlags_Disabled, isRenderingVideo); // disable button if already rendering
+        renderVideoButton = ImGui::Button("Render Video");
+        ImGui::PopItemFlag();
+    }
+    
+
     if (!highPrecisionMode) {
+
         if (ImGui::Checkbox("Julia Set", &juliaMode)) {
             stabilityVisualiser = false;
         }
@@ -101,6 +111,19 @@ void FractalVisualiser::draw() {
     //draw real time mode
     else {
         renderRealTimeFractal();
+    }
+
+    //rendering videos
+    if (isRenderingVideo) {
+        videoFrameCount++;
+        //take frames
+        Image image = LoadImageFromScreen();
+        videoFrames.push_back(image.data);
+        UnloadImage(image);
+        std::cout << videoFrameCount << "\n";
+        if (videoFrameCount == videoMaxFrames) {
+            isRenderingVideo = false;
+        }
     }
 }
 
@@ -241,7 +264,6 @@ Vector2 FractalVisualiser::tricornFormula(Vector2 z, Vector2 c)
 // high precision mode (runs with arbitrary precision floats)
 void FractalVisualiser::drawCalculatedFractalToImage()
 {
-    
     // convert coordinate to string to coordinates and invert the signs
     double real = std::stod(realCoordinate);
     double imag = std::stod(imaginaryCoordinate);
@@ -279,6 +301,7 @@ void FractalVisualiser::drawCalculatedFractalToImage()
             }
             //convert RGB to HSV
             Color color = ColorFromHSV((i / float(iterations)) * 360, 1.0, 1.0);
+
             ImageDrawPixel(&highPrecisionImage, x, y, color);
             int total = x * column + y;
 
@@ -379,9 +402,15 @@ void FractalVisualiser::events()
 
         //save
         Image image = LoadImageFromScreen();
-        std::cout << "Exported\n";
-        //ExportImage(image, name);
-        //UnloadImage(image);
+        ExportImage(image, name);
+        UnloadImage(image);
+    }
+
+    //start rendering process
+    if (renderVideoButton) {
+        videoFrameCount = 0;
+        isRenderingVideo = true;
+        videoFrames.clear();
     }
 }
 

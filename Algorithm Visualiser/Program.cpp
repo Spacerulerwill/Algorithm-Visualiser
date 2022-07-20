@@ -3,6 +3,7 @@
 #include "rlImGui.h"
 #include "SortingVisualiser.h"
 #include "FractalVisualiser.h"
+#include <thread>
 
 //singleton stuff
 Program* Program::Instance = nullptr;

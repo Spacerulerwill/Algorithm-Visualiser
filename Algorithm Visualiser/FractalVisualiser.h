@@ -1,6 +1,7 @@
 #pragma once
 #include "ScreenElement.h"
 #include <string>
+#include <vector>
 
 class FractalVisualiser :
 
@@ -52,15 +53,15 @@ private:
 
     // preset color schemes
     int selectedColorPreset = 0;
-    const static int numColors = 5;
-
-    const char* colorPresetNames[numColors] = {"Default", "Electric Blue", "Blood Red", "Neon Green", "Pretty Pink"};
+    const static int numColors = 6;
+    const char* colorPresetNames[numColors] = {"Default", "Electric Blue", "Blood Red", "Neon Green", "Pretty Pink", "Hannah Pink"};
     const float colorPresets[numColors][4] = { 
         {0.0f, 0.0f, 0.0f, 0.0f}, 
         {0.109f, 0.134f, 0.144f, 0.791f},
         {0.199f, 0.159f, 0.164f, 1.0f}, 
         {1.0f, 0.308f, 0.194f, 1.0f},
-        {0.213f, 0.131f,0.197f, 1.0f}
+        {0.213f, 0.131f,0.197f, 1.0f},
+        {0.337f, 0.254f, 0.277f, 1.0f}
     };
 
     //fractal shaders
@@ -77,11 +78,18 @@ private:
     bool zoomInputBox;
     bool renderButton;
     bool saveImageButton;
+    bool renderVideoButton;
     bool mouseOrbit;
 
-    //orbit controls
+    // orbit controls
     float orbitRadius = 0.05f;
     float orbitSpeed = 1.0f;
+
+    // recording
+    bool isRenderingVideo = false;
+    std::vector<void *> videoFrames;
+    int videoFrameCount = 0;
+    int videoMaxFrames = 2 * PI * 60;
 
     //high precision fractal settings
     Image highPrecisionImage;
@@ -116,12 +124,12 @@ private:
     void drawFractalLoadPercentage();
 
     Vector2 mandelbrotFormula(Vector2 z, Vector2 c);
-    DVector2 preciseMandelbrotFormula(DVector2 z, DVector2 c);
     Vector2 burningshipFormula(Vector2 z, Vector2 c);
     Vector2 tricornFormula(Vector2 z, Vector2 c);
 
+    DVector2 preciseMandelbrotFormula(DVector2 z, DVector2 c);
+
     bool highPrecisionMode = false;
     bool juliaFrozen = false;
-
 };
 
