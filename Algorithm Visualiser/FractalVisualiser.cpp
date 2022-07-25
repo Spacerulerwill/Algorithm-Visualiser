@@ -67,6 +67,7 @@ void FractalVisualiser::draw() {
     }
     
 
+    // high precision mode widgets
     if (!highPrecisionMode) {
 
         if (ImGui::Checkbox("Julia Set", &juliaMode)) {
@@ -207,8 +208,8 @@ void FractalVisualiser::renderRealTimeFractal()
             }
 
             //convert back to screen space coordinates
-            int x = z.x / ((maxR - minR) / getWidth()) - minR + getWidth() / 2;;
-            int y = z.y / ((maxI - minI) / getHeight()) - minI + getHeight() / 2;
+            int x = ((z.x - location.x) * (getWidth() / (maxR - minR))) + getWidth() / 2;
+            int y = ((z.y + location.y) * (getHeight() / (maxI - minI))) + getHeight() / 2;
 
             DrawCircle(x, y, 5, RED);
         }

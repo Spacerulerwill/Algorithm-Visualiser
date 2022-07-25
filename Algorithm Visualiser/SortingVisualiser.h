@@ -53,7 +53,8 @@ private:
 
 	int algorithmIndex = 0;
 
-	const char * sortOptions[5] = {"Bubble Sort O(n^2)", "Insertion Sort O(n^2)", "Selection Sort O(n^2)", "Counting Sort O(n+k)", "Quick Sort O(nlogn)"};
+	const static int numSorts = 5;
+	const char * sortOptions[numSorts] = {"Bubble Sort O(n^2)", "Insertion Sort O(n^2)", "Selection Sort O(n^2)", "Counting Sort O(n+k)", "Quick Sort O(nlogn)"};
 
 	std::string informationText;
 	

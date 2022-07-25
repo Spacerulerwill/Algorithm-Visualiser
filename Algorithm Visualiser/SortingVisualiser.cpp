@@ -147,7 +147,7 @@ void SortingVisualiser::drawSidebar() {
 	ImGui::PushItemFlag(ImGuiItemFlags_Disabled, !(state == State::IDLE)); // disable controls if sorting
 	ImGui::Text("Select Algorithm");
 	ImGui::PushItemWidth(ImGui::GetWindowWidth() - ImGui::GetStyle().FramePadding.x * 4);
-	algorithmSelector = ImGui::Combo("##", &algorithmIndex, sortOptions, 5);
+	algorithmSelector = ImGui::Combo("##", &algorithmIndex, sortOptions, numSorts);
 	ImGui::PopItemFlag();
 
 	ImGui::EndChild();
