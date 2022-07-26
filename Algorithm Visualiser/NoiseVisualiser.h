@@ -1,5 +1,6 @@
 #pragma once
 #include "ScreenElement.h"
+#include <chrono>
 class NoiseVisualiser : public ScreenElement
 {
 public:
@@ -7,6 +8,9 @@ public:
 	NoiseVisualiser(float xRatio, float yRatio, float widthRatio, float heightRatio);
 	~NoiseVisualiser();
 private:
+	// uniforms
+	int timeLoc;
+
 	// overridable methods
 	void draw() override;
 	void keyEvents() override;
@@ -25,5 +29,7 @@ private:
 	Shader* activeNoise;
 
 	void setNoise(Shader& shader);
+
+	std::chrono::steady_clock::time_point start_time;
 };
 

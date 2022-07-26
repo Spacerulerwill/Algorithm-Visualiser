@@ -1,12 +1,14 @@
 #include "NoiseVisualiser.h"
 #include "imgui.h"
 #include <iostream>
-#include <iomanip>
+#include <chrono>
 
 #define GLSL_VERSION 450
 
 NoiseVisualiser::NoiseVisualiser(float xRatio, float yRatio, float widthRatio, float heightRatio) : ScreenElement(xRatio, yRatio, widthRatio, heightRatio)
 {
+	start_time = std::chrono::steady_clock::now();
+
 	//initialise random seed
 	srand(time(NULL));
 
@@ -17,6 +19,7 @@ NoiseVisualiser::NoiseVisualiser(float xRatio, float yRatio, float widthRatio, f
 	UnloadImage(imBlank);
 
 	setNoise(randomNoise);
+
 }
 
 NoiseVisualiser::~NoiseVisualiser()
@@ -38,33 +41,18 @@ void NoiseVisualiser::draw()
 	BeginShaderMode(*activeNoise);
 	DrawTexturePro(noiseTex, Rectangle{ getX(), getY(), (float)noiseTex.width, (float)noiseTex.height }, Rectangle{ getX(), getY(), getWidth(), getHeight() }, Vector2{ 0, 0 }, 0.0f, WHITE);
 	EndShaderMode();
+
+	std::chrono::steady_clock::time_point current_time = std::chrono::steady_clock::now();
+
+	int time = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+
+	SetShaderValue(*activeNoise, timeLoc, &time, SHADER_UNIFORM_INT);
 }
 
 void NoiseVisualiser::keyEvents()
 {
 
 }
-
-/*
-void NoiseVisualiser::renderRandomNoise() {
-	//clear image
-	Image noiseImg = GenImageColor((int)getWidth(), (int)getHeight(), BLANK);
-
-	for (int x = 0; x < getWidth(); x++) {
-		for (int y = 0; y < getHeight(); y++) {
-			int8_t red = rand() % 0xff + 1;
-			int8_t blue = rand() % 0xff + 1;
-			int8_t green = rand() % 0xff + 1;
-
-			Color col = {red, blue, green, 255};
-			ImageDrawPixel(&noiseImg, x, y, col);
-		}
-	}
-	
-	noiseTex = LoadTextureFromImage(noiseImg);
-	UnloadImage(noiseImg);
-}
-*/
 
 void NoiseVisualiser::events()
 {
@@ -83,4 +71,5 @@ void NoiseVisualiser::setNoise(Shader& noise)
 	if (&noise != activeNoise) {
 		activeNoise = &noise;
 	}
+	timeLoc = GetShaderLocation(*activeNoise, "time");
 }
