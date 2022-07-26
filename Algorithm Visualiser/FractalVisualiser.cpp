@@ -21,8 +21,8 @@ FractalVisualiser::FractalVisualiser(float xRatio, float yRatio, float widthRati
 
     Image imBlank = GenImageColor((int)getWidth(), (int)getHeight(), BLANK);
     realTimeTexture = LoadTextureFromImage(imBlank);  // Load blank texture to fill on shader
-
     UnloadImage(imBlank);
+
     setFractal(mandelbrot);
 }   
 
@@ -39,7 +39,10 @@ T FractalVisualiser::mapToImaginary(int y, T minI, T maxI) {
 }
 
 void FractalVisualiser::draw() {
+
+    ImGui::SetNextWindowSize({ 0.0f, 0.0f });
     ImGui::Begin("Fractal Settings", NULL, ImGuiWindowFlags_None);
+
     fractalSelector = ImGui::Combo("Fractal", &selectedFractal, fractals, numFractals);
     ImGui::SliderInt("Iterations", &iterations, 0, 1000, "% .3f");
 

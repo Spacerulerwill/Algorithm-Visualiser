@@ -3,6 +3,7 @@
 #include "rlImGui.h"
 #include "SortingVisualiser.h"
 #include "FractalVisualiser.h"
+#include "NoiseVisualiser.h"
 #include <thread>
 
 //singleton stuff
@@ -26,9 +27,10 @@ Program::Program()
 	// FPS
 	SetTargetFPS(FPS);
 
-	//initialise intialiser modules
+	//initialise visualiser modules
 	sortVisualiser = new SortingVisualiser(0.0f, 0.0f, 0.875f, 1.0f);
 	fractalVisualiser = new FractalVisualiser(0.0f, 0.0f, 1.0f, 1.0f);
+	noiseVisualiser = new NoiseVisualiser(0.0f, 0.0f, 1.0f, 1.0f);
 
 	//set active visualiser to sort visualiser
 	activeVisualiser = sortVisualiser;
@@ -51,6 +53,10 @@ Program::Program()
 				activeVisualiser = fractalVisualiser;
 				break;
 			}
+			case 2: {
+				activeVisualiser = noiseVisualiser;
+				break;
+			}
 			}
 		}
 
@@ -61,13 +67,15 @@ Program::Program()
 		EndDrawing();
 	}
 
-	//closing raylib and ImGui
+	// closing raylib and ImGui
 	ShutdownRLImGui();
 	ImGui::DestroyContext();
 	CloseWindow();
 
+	// delete visualisers to avoid memory leak
 	delete sortVisualiser;
 	delete fractalVisualiser;
+	delete noiseVisualiser;
 }
 
 void Program::drawAlgorithmSelector()

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -144,12 +144,14 @@
     <ClCompile Include="FractalVisualiser.cpp" />
     <ClCompile Include="imgui_impl_raylib.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="NoiseVisualiser.cpp" />
     <ClCompile Include="Program.cpp" />
     <ClCompile Include="rlImGui.cpp" />
     <ClCompile Include="SortingVisualiser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FractalVisualiser.h" />
+    <ClInclude Include="NoiseVisualiser.h" />
     <ClInclude Include="Program.h" />
     <ClInclude Include="ScreenElement.h" />
     <ClInclude Include="SortingVisualiser.h" />

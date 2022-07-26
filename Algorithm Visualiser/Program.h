@@ -11,6 +11,7 @@ public:
 	SortingVisualiser* sortVisualiser;
 	ScreenElement* activeVisualiser;
 	ScreenElement* fractalVisualiser;
+	ScreenElement* noiseVisualiser;
 
 private:
 
