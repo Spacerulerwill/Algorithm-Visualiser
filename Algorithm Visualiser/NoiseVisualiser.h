@@ -14,7 +14,6 @@ private:
 
 	// settings menu
 	bool noiseSelector = false;
-	bool renderNoiseButton = false;
 
 	int selectedNoise = 0;
 	const static int numNoises = 1;
@@ -22,6 +21,9 @@ private:
 
 	Texture2D noiseTex;
 
-	void renderRandomNoise();
+	Shader randomNoise;
+	Shader* activeNoise;
+
+	void setNoise(Shader& shader);
 };
 

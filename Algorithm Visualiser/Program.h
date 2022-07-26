@@ -28,5 +28,7 @@ private:
 	int selectedAlgorithmType = 0;
 	bool algorithmTypeSelector = false;
 
+	void setNoise(Shader& shader);
+
 };
 

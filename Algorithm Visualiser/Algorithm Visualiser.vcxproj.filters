@@ -33,6 +33,9 @@
     <ClCompile Include="rlImGui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="NoiseVisualiser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FractalVisualiser.h">
@@ -47,15 +50,21 @@
     <ClInclude Include="SortingVisualiser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NoiseVisualiser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\burningship.fs">
+    <None Include="shaders\noise\randomnoise.fs">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="shaders\mandelbrot.fs">
+    <None Include="shaders\fractal\burningship.fs">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="shaders\tricorn.fs">
+    <None Include="shaders\fractal\mandelbrot.fs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="shaders\fractal\tricorn.fs">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

@@ -157,9 +157,10 @@
     <ClInclude Include="SortingVisualiser.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\burningship.fs" />
-    <None Include="shaders\mandelbrot.fs" />
-    <None Include="shaders\tricorn.fs" />
+    <None Include="shaders\fractal\burningship.fs" />
+    <None Include="shaders\fractal\mandelbrot.fs" />
+    <None Include="shaders\fractal\tricorn.fs" />
+    <None Include="shaders\noise\randomnoise.fs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

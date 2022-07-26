@@ -15,9 +15,9 @@
 
 FractalVisualiser::FractalVisualiser(float xRatio, float yRatio, float widthRatio, float heightRatio) : ScreenElement(xRatio, yRatio, widthRatio, heightRatio)
 {
-	mandelbrot = LoadShader(0, TextFormat("shaders/mandelbrot.fs", GLSL_VERSION));
-    burningShip = LoadShader(0, TextFormat("shaders/burningship.fs", GLSL_VERSION));
-    tricorn = LoadShader(0, TextFormat("shaders/tricorn.fs", GLSL_VERSION));
+	mandelbrot = LoadShader(0, TextFormat("shaders/fractal/mandelbrot.fs", GLSL_VERSION));
+    burningShip = LoadShader(0, TextFormat("shaders/fractal/burningship.fs", GLSL_VERSION));
+    tricorn = LoadShader(0, TextFormat("shaders/fractal/tricorn.fs", GLSL_VERSION));
 
     Image imBlank = GenImageColor((int)getWidth(), (int)getHeight(), BLANK);
     realTimeTexture = LoadTextureFromImage(imBlank);  // Load blank texture to fill on shader
