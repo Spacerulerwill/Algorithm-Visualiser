@@ -160,7 +160,10 @@
     <None Include="shaders\fractal\burningship.fs" />
     <None Include="shaders\fractal\mandelbrot.fs" />
     <None Include="shaders\fractal\tricorn.fs" />
+    <None Include="shaders\noise\cellularnoise.fs" />
+    <None Include="shaders\noise\perlinnoise.fs" />
     <None Include="shaders\noise\randomnoise.fs" />
+    <None Include="shaders\noise\valuenoise.fs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

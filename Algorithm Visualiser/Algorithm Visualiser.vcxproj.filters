@@ -67,5 +67,14 @@
     <None Include="shaders\fractal\tricorn.fs">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="shaders\noise\valuenoise.fs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="shaders\noise\perlinnoise.fs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="shaders\noise\cellularnoise.fs">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

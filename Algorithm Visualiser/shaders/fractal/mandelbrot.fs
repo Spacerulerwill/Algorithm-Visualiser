@@ -53,7 +53,6 @@ vec3 mandelbrot(vec2 point){
 void main()
 {
     vec2 uv = gl_FragCoord.xy / resolution;
-
     uv.x *= resolution.x / resolution.y;
     uv -= vec2((resolution.x/resolution.y)/2, 0.5); //move center of mandelbrot to center
     
