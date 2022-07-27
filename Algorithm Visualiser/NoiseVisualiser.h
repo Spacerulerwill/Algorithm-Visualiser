@@ -10,6 +10,7 @@ public:
 private:
 	// uniforms
 	int timeLoc;
+	int dimensionLoc;
 
 	// overridable methods
 	void draw() override;
@@ -18,6 +19,11 @@ private:
 
 	// settings menu
 	bool noiseSelector = false;
+
+	bool dimensionSelector = false;
+	int selectedDimension = 1;
+	const char* dimensions[3] = { "1D", "2D", "3D" };
+	bool isStatic = false;
 
 	int selectedNoise = 0;
 	const static int numNoises = 1;

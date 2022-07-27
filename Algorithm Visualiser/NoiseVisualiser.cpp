@@ -36,6 +36,12 @@ void NoiseVisualiser::draw()
 
 	// noise selector
 	noiseSelector = ImGui::Combo("Noise Type", &selectedNoise, noises, numNoises);
+
+	// dimension selector
+	dimensionSelector = ImGui::Combo("Dimension", &selectedDimension, dimensions, 3);
+
+	// static checkbox
+	ImGui::Checkbox("static", &isStatic);
 	ImGui::End();
 
 	BeginShaderMode(*activeNoise);
@@ -43,10 +49,14 @@ void NoiseVisualiser::draw()
 	EndShaderMode();
 
 	std::chrono::steady_clock::time_point current_time = std::chrono::steady_clock::now();
+	int time = 0;
 
-	int time = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+	if (!isStatic) {
+		time = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+		SetShaderValue(*activeNoise, timeLoc, &time, SHADER_UNIFORM_INT);
+	}
 
-	SetShaderValue(*activeNoise, timeLoc, &time, SHADER_UNIFORM_INT);
+	SetShaderValue(*activeNoise, dimensionLoc, &selectedDimension, SHADER_UNIFORM_INT);
 }
 
 void NoiseVisualiser::keyEvents()
@@ -64,6 +74,10 @@ void NoiseVisualiser::events()
 		}
 		}
 	}
+
+	if (dimensionSelector) {
+
+	}
 }
 
 void NoiseVisualiser::setNoise(Shader& noise)
@@ -72,4 +86,5 @@ void NoiseVisualiser::setNoise(Shader& noise)
 		activeNoise = &noise;
 	}
 	timeLoc = GetShaderLocation(*activeNoise, "time");
+	dimensionLoc = GetShaderLocation(*activeNoise, "dimension");
 }
