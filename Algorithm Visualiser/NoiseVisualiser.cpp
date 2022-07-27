@@ -58,6 +58,9 @@ void NoiseVisualiser::draw()
 	// dimension selector
 	dimensionSelector = ImGui::Combo("Dimension", &selectedDimension, dimensions, 3);
 
+	// octaves slider
+	ImGui::SliderInt("Octaves", &octaves, 1, 5);
+
 	// static checkbox
 	ImGui::Checkbox("static", &isStatic);
 	ImGui::End();
@@ -78,6 +81,7 @@ void NoiseVisualiser::draw()
 	SetShaderValue(*activeNoise, zoomLoc, &zoom, SHADER_UNIFORM_FLOAT);
 	SetShaderValue(*activeNoise, locationLoc, &location, SHADER_UNIFORM_VEC2);
 	SetShaderValue(*activeNoise, resolutionLoc, &resolution, SHADER_UNIFORM_VEC2);
+	SetShaderValue(*activeNoise, octavesLoc, &octaves, SHADER_UNIFORM_INT);
 }
 
 void NoiseVisualiser::keyEvents()
@@ -166,5 +170,5 @@ void NoiseVisualiser::setNoise(Shader& noise)
 	zoomLoc = GetShaderLocation(*activeNoise, "zoom");
 	locationLoc = GetShaderLocation(*activeNoise, "location");
 	resolutionLoc = GetShaderLocation(*activeNoise, "resolution");
-
+	octavesLoc = GetShaderLocation(*activeNoise, "octaves");
 }

@@ -13,6 +13,7 @@ private:
 	int zoomLoc;
 	int locationLoc;
 	int resolutionLoc;
+	int octavesLoc;
 
 	// overridable methods
 	void draw() override;
@@ -38,6 +39,8 @@ private:
 
 	Vector2 location = { 0.0f, 0.0f };
 	Vector2 resolution = { getWidth(), getHeight() };
+
+	int octaves = 1;
 
 	// seed function - makes seed fluctuate up and down
 	void seedLoop();

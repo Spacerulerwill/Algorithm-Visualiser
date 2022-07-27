@@ -4,6 +4,7 @@ uniform int seed;
 uniform float zoom;
 uniform vec2 location;
 uniform vec2 resolution;
+uniform int octaves;
 
 float PHI = 1.61803398874989484820459;  // Golden Ratio   
 

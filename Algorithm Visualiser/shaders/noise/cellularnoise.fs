@@ -4,6 +4,7 @@ uniform int seed;
 uniform float zoom;
 uniform vec2 location;
 uniform vec2 resolution;
+uniform int octaves;
 
 float PHI = 1.61803398874989484820459;  // Golden Ratio   
 float PI = 3.1415926535;
@@ -21,13 +22,27 @@ float cellular_noise(vec2 coord) {
 
     for (float x = -1.0; x <= 1.0; x++){
         for (float y = -1.0; y <= 1.0; y++){
-            vec2 node = vec2(gold_noise(vec2(i.x+x, i.y+y), seed), gold_noise(vec2(i.x+x, i.y+y), seed+1)) + vec2(x,y);
+            vec2 node = vec2(gold_noise(i + vec2(x,y), seed), gold_noise(i + vec2(x,y), seed+1)) + vec2(x,y);
             
             float dist = sqrt((f - node).x * (f - node).x + (f - node).y * (f - node).y);
 			min_dist = min(min_dist, dist);
         }
     }
     return min_dist;
+}
+
+float fbm(vec2 coord){       
+    float normalised_factor = 0.0;
+    float value = 0.0;
+    float scale = 0.5;
+
+    for (int i = 0; i < octaves; i++){
+        value += cellular_noise(coord) * scale;
+        coord *= 2;
+        normalised_factor += scale;
+        scale *= 0.5;
+    }
+    return value / normalised_factor;
 }
 
 void main()
@@ -38,6 +53,6 @@ void main()
     uv *= zoom;
     uv += location;
 
-    float value = cellular_noise(uv);
+    float value = fbm(uv);
     gl_FragColor = vec4(vec3(value), 1.0);
 }

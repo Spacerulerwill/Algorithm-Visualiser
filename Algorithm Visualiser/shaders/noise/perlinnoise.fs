@@ -4,6 +4,7 @@ uniform int seed;
 uniform float zoom;
 uniform vec2 location;
 uniform vec2 resolution;
+uniform int octaves;
 
 float PHI = 1.61803398874989484820459;  // Golden Ratio   
 float PI = 3.1415926535;
@@ -44,6 +45,20 @@ float perlin_noise(vec2 coord) {
     return wholemix + 0.5;
 }
 
+float fbm(vec2 coord){       
+    float normalised_factor = 0.0;
+    float value = 0.0;
+    float scale = 0.5;
+
+    for (int i = 0; i < octaves; i++){
+        value += perlin_noise(coord) * scale;
+        coord *= 2;
+        normalised_factor += scale;
+        scale *= 0.5;
+    }
+    return value / normalised_factor;
+}
+
 void main()
 {
     vec2 uv = gl_FragCoord.xy / resolution;
@@ -52,6 +67,6 @@ void main()
     uv *= zoom;
     uv += location;
 
-    float value = perlin_noise(uv);
+    float value = fbm(uv);
     gl_FragColor = vec4(vec3(value), 1.0);
 }
